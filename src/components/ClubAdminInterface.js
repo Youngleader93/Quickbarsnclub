@@ -92,18 +92,18 @@ const ClubAdminInterface = ({ clubId }) => {
                 {user?.email} {isSuperAdmin() && <span className="text-yellow-400">• Super Admin</span>}
               </p>
             </div>
-            <div className="flex gap-2 sm:gap-3 flex-wrap">
+            <div className="flex gap-3 sm:gap-3 flex-wrap">
               {isSuperAdmin() && (
                 <a
                   href="/admin"
-                  className="px-4 sm:px-5 py-2.5 sm:py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-all text-sm sm:text-base"
+                  className="px-5 sm:px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-all text-sm sm:text-base min-h-[44px] flex items-center"
                 >
                   Super Admin
                 </a>
               )}
               <button
                 onClick={handleLogout}
-                className="px-4 sm:px-5 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-red-500/20 text-sm sm:text-base"
+                className="px-5 sm:px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-red-500/20 text-sm sm:text-base min-h-[44px]"
               >
                 Déconnexion
               </button>
@@ -111,10 +111,10 @@ const ClubAdminInterface = ({ clubId }) => {
           </div>
 
           {/* NAVIGATION */}
-          <div className="flex gap-2 flex-wrap overflow-x-auto pb-2">
+          <div className="flex gap-3 sm:gap-4 flex-wrap overflow-x-auto pb-2">
             <button
               onClick={() => setActiveTab('menu')}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap ${
+              className={`px-5 sm:px-5 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap min-h-[44px] ${
                 activeTab === 'menu'
                   ? 'bg-gradient-to-r from-green-600 to-green-500 text-black shadow-lg shadow-green-500/30'
                   : 'hover:bg-gray-800/50 text-gray-300 hover:text-white font-medium'
@@ -124,7 +124,7 @@ const ClubAdminInterface = ({ clubId }) => {
             </button>
             <button
               onClick={() => setActiveTab('qrcodes')}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap ${
+              className={`px-5 sm:px-5 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap min-h-[44px] ${
                 activeTab === 'qrcodes'
                   ? 'bg-gradient-to-r from-green-600 to-green-500 text-black shadow-lg shadow-green-500/30'
                   : 'hover:bg-gray-800/50 text-gray-300 hover:text-white font-medium'
@@ -134,7 +134,7 @@ const ClubAdminInterface = ({ clubId }) => {
             </button>
             <button
               onClick={() => setActiveTab('settings')}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap ${
+              className={`px-5 sm:px-5 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap min-h-[44px] ${
                 activeTab === 'settings'
                   ? 'bg-gradient-to-r from-green-600 to-green-500 text-black shadow-lg shadow-green-500/30'
                   : 'hover:bg-gray-800/50 text-gray-300 hover:text-white font-medium'
@@ -144,7 +144,7 @@ const ClubAdminInterface = ({ clubId }) => {
             </button>
             <a
               href={`/${clubId}/tablette`}
-              className="px-4 sm:px-5 py-2 sm:py-2.5 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all text-sm sm:text-base whitespace-nowrap"
+              className="px-5 sm:px-5 py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all text-sm sm:text-base whitespace-nowrap min-h-[44px] flex items-center"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -152,7 +152,7 @@ const ClubAdminInterface = ({ clubId }) => {
             </a>
             <a
               href={`/${clubId}`}
-              className="px-4 sm:px-5 py-2 sm:py-2.5 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all text-sm sm:text-base whitespace-nowrap"
+              className="px-5 sm:px-5 py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all text-sm sm:text-base whitespace-nowrap min-h-[44px] flex items-center"
               target="_blank"
               rel="noopener noreferrer"
             >

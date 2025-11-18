@@ -119,7 +119,7 @@ const SuperAdminInterface = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-red-500/20 text-sm sm:text-base whitespace-nowrap"
+              className="px-5 sm:px-6 py-3 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-red-500/20 text-sm sm:text-base whitespace-nowrap min-h-[44px]"
             >
               Déconnexion
             </button>
@@ -130,22 +130,22 @@ const SuperAdminInterface = () => {
       {/* NAVIGATION */}
       <div className="bg-gray-900/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex gap-2 overflow-x-auto">
+          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2">
             <a
               href="/admin"
-              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-green-500 text-black rounded-xl font-semibold shadow-lg shadow-green-500/30 whitespace-nowrap text-sm sm:text-base"
+              className="px-5 sm:px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-black rounded-xl font-semibold shadow-lg shadow-green-500/30 whitespace-nowrap text-sm sm:text-base min-h-[44px] flex items-center"
             >
               Dashboard
             </a>
             <a
               href="/admin/clubs"
-              className="px-4 sm:px-6 py-2.5 sm:py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base"
+              className="px-5 sm:px-6 py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base min-h-[44px] flex items-center"
             >
               Clubs
             </a>
             <a
               href="/admin/users"
-              className="px-4 sm:px-6 py-2.5 sm:py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base"
+              className="px-5 sm:px-6 py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base min-h-[44px] flex items-center"
             >
               Utilisateurs
             </a>
@@ -200,16 +200,16 @@ const SuperAdminInterface = () => {
                       <div className="text-xs sm:text-sm text-gray-500 truncate">ID: {club.id}</div>
                     </div>
                   </div>
-                  <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                  <div className="flex gap-3 sm:gap-3 w-full sm:w-auto">
                     <a
                       href={`/${club.id}/admin`}
-                      className="flex-1 sm:flex-none text-center px-3 sm:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-medium transition-all shadow-lg shadow-blue-500/20 whitespace-nowrap"
+                      className="flex-1 sm:flex-none text-center px-4 sm:px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-medium transition-all shadow-lg shadow-blue-500/20 whitespace-nowrap min-h-[44px] flex items-center justify-center"
                     >
                       Admin Club
                     </a>
                     <a
                       href={`/${club.id}`}
-                      className="flex-1 sm:flex-none text-center px-3 sm:px-5 py-2 sm:py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap"
+                      className="flex-1 sm:flex-none text-center px-4 sm:px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap min-h-[44px] flex items-center justify-center"
                       target="_blank"
                       rel="noopener noreferrer"
                     >

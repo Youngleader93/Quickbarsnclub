@@ -415,16 +415,19 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
 
         return (
           <div key={category.id} className="border rounded-lg" style={{ borderColor: '#00FF41' }}>
-            <div className="p-3 sm:p-4 border-b flex items-center gap-2" style={{ borderColor: '#00FF41' }}>
+            <div className="p-2.5 sm:p-3 border-b flex items-center gap-2" style={{ borderColor: '#00FF41' }}>
               <CategoryIcon size={18} className="sm:w-5 sm:h-5" style={{ color: '#00FF41' }} />
-              <h3 className="text-base sm:text-lg font-bold font-mono" style={{ color: '#00FF41' }}>
-                {category.label} ({items.length})
+              <h3 className="text-sm sm:text-base font-bold font-mono flex items-center gap-2" style={{ color: '#00FF41' }}>
+                {category.label} <span className="text-xs sm:text-sm font-normal bg-green-500/20 px-2 py-0.5 rounded">({items.length})</span>
               </h3>
             </div>
 
-            <div className="p-3 sm:p-4">
+            <div className={items.length === 0 ? 'p-4 sm:p-6' : 'p-2.5 sm:p-3'}>
               {items.length === 0 ? (
-                <p className="text-gray-500 italic font-mono">Aucun item dans cette catégorie</p>
+                <div className="text-center">
+                  <p className="text-gray-400 font-mono text-sm sm:text-base font-medium">Aucun item dans cette catégorie</p>
+                  <p className="text-gray-600 text-xs mt-1">Ajoutez des items depuis le bouton ci-dessus</p>
+                </div>
               ) : (
                 <div className="space-y-2">
                   {items.map(item => (

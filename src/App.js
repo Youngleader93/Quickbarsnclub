@@ -992,19 +992,19 @@ const TabletInterface = ({ etablissementId }) => {
   const readyOrders = orders.filter(o => o.status === 'ready');
 
   return (
-    <div className="min-h-screen bg-black p-6">
+    <div className="min-h-screen bg-black p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Club name in top-right */}
         {etablissementName && (
-          <div className="absolute top-6 right-6">
-            <h2 className="text-xl font-bold text-white">
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+            <h2 className="text-base sm:text-xl font-bold text-white">
               {etablissementName}
             </h2>
           </div>
         )}
 
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold tracking-tight" style={{
+        <div className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight" style={{
             color: '#00FF41',
             fontWeight: '600',
             letterSpacing: '-0.02em'
@@ -1013,15 +1013,15 @@ const TabletInterface = ({ etablissementId }) => {
           </h1>
         </div>
 
-        <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-xl">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className={`w-4 h-4 rounded-full ${ordersOpen ? 'bg-green-500' : 'bg-red-500'} shadow-lg ${ordersOpen ? 'shadow-green-500/50' : 'shadow-red-500/50'}`}></div>
+        <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full ${ordersOpen ? 'bg-green-500' : 'bg-red-500'} shadow-lg ${ordersOpen ? 'shadow-green-500/50' : 'shadow-red-500/50'}`}></div>
               <div>
-                <div className={`text-xl font-semibold ${ordersOpen ? 'text-green-400' : 'text-red-400'}`}>
+                <div className={`text-lg sm:text-xl font-semibold ${ordersOpen ? 'text-green-400' : 'text-red-400'}`}>
                   Commandes {ordersOpen ? 'Ouvertes' : 'Fermées'}
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-xs sm:text-sm text-gray-500">
                   {ordersOpen ? 'Les clients peuvent commander' : 'Nouvelles commandes bloquées'}
                 </div>
               </div>
@@ -1030,7 +1030,7 @@ const TabletInterface = ({ etablissementId }) => {
             <button
               onClick={toggleOrdersOpen}
               disabled={isUpdating}
-              className={`px-8 py-4 rounded-xl font-semibold transition-all duration-200 ${
+              className={`w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-200 min-h-[44px] text-sm sm:text-base ${
                 ordersOpen
                   ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/20'
                   : 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30'
@@ -1040,9 +1040,9 @@ const TabletInterface = ({ etablissementId }) => {
             </button>
           </div>
 
-          <div className="flex items-baseline gap-3">
-            <span className="text-gray-400">Commandes en attente :</span>
-            <span className={`text-3xl font-bold ${
+          <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
+            <span className="text-gray-400 text-sm sm:text-base">Commandes en attente :</span>
+            <span className={`text-2xl sm:text-3xl font-bold ${
               pendingOrders.length < 5 ? 'text-white' :
               pendingOrders.length < 10 ? 'text-yellow-500' :
               'text-red-500 animate-pulse'
@@ -1050,21 +1050,24 @@ const TabletInterface = ({ etablissementId }) => {
               {pendingOrders.length}
             </span>
             {pendingOrders.length >= 10 && (
-              <span className="text-red-500 text-sm font-semibold px-3 py-1 bg-red-500/10 rounded-full">
+              <span className="text-red-500 text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 bg-red-500/10 rounded-full">
                 Alerte surcharge
               </span>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div>
-            <h2 className="text-xl font-semibold mb-6 text-yellow-400 flex items-center gap-3">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-yellow-400 flex items-center gap-2 sm:gap-3">
               En attente
-              <span className="text-sm font-normal text-gray-500">({pendingOrders.length})</span>
+              <span className="text-xs sm:text-sm font-normal bg-yellow-500/20 px-2 py-0.5 rounded text-yellow-400">({pendingOrders.length})</span>
             </h2>
             {pendingOrders.length === 0 ? (
-              <div className="text-center py-12 text-gray-600">Aucune commande en attente</div>
+              <div className="text-center py-8 sm:py-12 bg-gray-900/20 rounded-xl">
+                <p className="text-gray-400 font-medium text-sm sm:text-base">Aucune commande en attente</p>
+                <p className="text-gray-600 text-xs mt-1">Les nouvelles commandes apparaîtront ici</p>
+              </div>
             ) : (
               <div className="space-y-4">
                 {pendingOrders.map(order => (
@@ -1110,12 +1113,15 @@ const TabletInterface = ({ etablissementId }) => {
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold mb-6 flex items-center gap-3" style={{ color: '#00FF41' }}>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3" style={{ color: '#00FF41' }}>
               Prêtes
-              <span className="text-sm font-normal text-gray-500">({readyOrders.length})</span>
+              <span className="text-xs sm:text-sm font-normal bg-green-500/20 px-2 py-0.5 rounded" style={{ color: '#00FF41' }}>({readyOrders.length})</span>
             </h2>
             {readyOrders.length === 0 ? (
-              <div className="text-center py-12 text-gray-600">Aucune commande prête</div>
+              <div className="text-center py-8 sm:py-12 bg-gray-900/20 rounded-xl">
+                <p className="text-gray-400 font-medium text-sm sm:text-base">Aucune commande prête</p>
+                <p className="text-gray-600 text-xs mt-1">Les commandes prêtes apparaîtront ici</p>
+              </div>
             ) : (
               <div className="space-y-4">
                 {readyOrders.map(order => (
