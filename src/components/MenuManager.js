@@ -514,7 +514,17 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
                                   : 'bg-gray-600 hover:bg-gray-700 text-white'
                               }`}
                             >
-                              {item.available ? <span className="hidden sm:inline">Disponible</span><span className="sm:hidden">Dispo</span> : <span className="hidden sm:inline">Indisponible</span><span className="sm:hidden">Indisp</span>}
+                              {item.available ? (
+                                <>
+                                  <span className="hidden sm:inline">Disponible</span>
+                                  <span className="sm:hidden">Dispo</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="hidden sm:inline">Indisponible</span>
+                                  <span className="sm:hidden">Indisp</span>
+                                </>
+                              )}
                             </button>
                             {/* Éditer */}
                             <button
