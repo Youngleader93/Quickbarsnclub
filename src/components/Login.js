@@ -51,10 +51,10 @@ const Login = ({ onLoginSuccess }) => {
   const displayError = localError || authError;
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3 tracking-tight" style={{ color: '#00FF41' }}>
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3 tracking-tight" style={{ color: '#00FF41' }}>
             QuickBar Admin
           </h1>
           <p className="text-gray-500 text-sm">Connexion administrateur</p>
