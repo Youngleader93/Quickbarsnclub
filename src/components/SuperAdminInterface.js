@@ -68,23 +68,23 @@ const SuperAdminInterface = () => {
 
   if (!isSuperAdmin()) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6">
-        <div className="max-w-md text-center">
-          <div className="w-20 h-20 mx-auto mb-8 rounded-full bg-red-500/10 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-full border-4 border-red-500"></div>
+      <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
+        <div className="max-w-md w-full text-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 rounded-full bg-red-500/10 flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-red-500"></div>
           </div>
-          <h1 className="text-3xl font-bold mb-4 text-red-500 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-red-500 tracking-tight">
             Accès Refusé
           </h1>
-          <p className="text-gray-400 mb-2">
+          <p className="text-sm sm:text-base text-gray-400 mb-2">
             Vous devez être Super Admin pour accéder à cette page.
           </p>
-          <p className="text-sm text-gray-500 mb-1">Rôle actuel : {userRole || 'aucun'}</p>
-          <p className="text-xs text-gray-600 mb-8">UID : {user?.uid}</p>
+          <p className="text-xs sm:text-sm text-gray-500 mb-1 truncate">Rôle actuel : {userRole || 'aucun'}</p>
+          <p className="text-xs text-gray-600 mb-6 sm:mb-8 truncate">UID : {user?.uid}</p>
           <div className="flex flex-col gap-3">
             <button
               onClick={reloadRole}
-              className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20"
+              className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20 text-sm sm:text-base"
             >
               Recharger les permissions
             </button>
@@ -93,7 +93,7 @@ const SuperAdminInterface = () => {
                 await logout();
                 window.location.href = '/admin/login';
               }}
-              className="w-full px-6 py-4 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30"
+              className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30 text-sm sm:text-base"
             >
               Se déconnecter
             </button>
@@ -107,19 +107,19 @@ const SuperAdminInterface = () => {
     <div className="min-h-screen bg-black">
       {/* HEADER */}
       <div className="bg-black/95 backdrop-blur-md shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold mb-1 tracking-tight" style={{ color: '#00FF41' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight truncate" style={{ color: '#00FF41' }}>
                 Super Admin Dashboard
               </h1>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500 truncate">
                 {displayName} • {user?.email}
               </p>
             </div>
             <button
               onClick={handleLogout}
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-red-500/20"
+              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-red-500/20 text-sm sm:text-base whitespace-nowrap"
             >
               Déconnexion
             </button>
@@ -129,23 +129,23 @@ const SuperAdminInterface = () => {
 
       {/* NAVIGATION */}
       <div className="bg-gray-900/30 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex gap-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex gap-2 overflow-x-auto">
             <a
               href="/admin"
-              className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-black rounded-xl font-semibold shadow-lg shadow-green-500/30"
+              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-green-500 text-black rounded-xl font-semibold shadow-lg shadow-green-500/30 whitespace-nowrap text-sm sm:text-base"
             >
               Dashboard
             </a>
             <a
               href="/admin/clubs"
-              className="px-6 py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all"
+              className="px-4 sm:px-6 py-2.5 sm:py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base"
             >
               Clubs
             </a>
             <a
               href="/admin/users"
-              className="px-6 py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all"
+              className="px-4 sm:px-6 py-2.5 sm:py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base"
             >
               Utilisateurs
             </a>
@@ -154,29 +154,29 @@ const SuperAdminInterface = () => {
       </div>
 
       {/* STATS GLOBALES */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-            <div className="text-gray-500 text-sm mb-2">Total Clubs</div>
-            <div className="text-5xl font-bold" style={{ color: '#00FF41' }}>{stats.totalClubs}</div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-xl">
+            <div className="text-gray-500 text-xs sm:text-sm mb-2">Total Clubs</div>
+            <div className="text-4xl sm:text-5xl font-bold" style={{ color: '#00FF41' }}>{stats.totalClubs}</div>
           </div>
-          <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-            <div className="text-gray-500 text-sm mb-2">Clubs Actifs</div>
-            <div className="text-5xl font-bold" style={{ color: '#00FF41' }}>{stats.activeClubs}</div>
+          <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-xl">
+            <div className="text-gray-500 text-xs sm:text-sm mb-2">Clubs Actifs</div>
+            <div className="text-4xl sm:text-5xl font-bold" style={{ color: '#00FF41' }}>{stats.activeClubs}</div>
           </div>
-          <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-            <div className="text-gray-500 text-sm mb-2">CA Total (Phase 4)</div>
-            <div className="text-5xl font-bold text-gray-700">-</div>
+          <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-xl">
+            <div className="text-gray-500 text-xs sm:text-sm mb-2">CA Total (Phase 4)</div>
+            <div className="text-4xl sm:text-5xl font-bold text-gray-700">-</div>
           </div>
         </div>
 
         {/* LISTE CLUBS */}
-        <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-white">Établissements</h2>
+        <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-white">Établissements</h2>
             <a
               href="/admin/clubs"
-              className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30"
+              className="w-full sm:w-auto text-center px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30 text-sm sm:text-base"
             >
               Gérer les clubs
             </a>
@@ -191,25 +191,25 @@ const SuperAdminInterface = () => {
               clubs.map(club => (
                 <div
                   key={club.id}
-                  className="flex items-center justify-between p-5 bg-gray-800/30 backdrop-blur-sm rounded-xl hover:bg-gray-800/50 transition-all"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-5 bg-gray-800/30 backdrop-blur-sm rounded-xl hover:bg-gray-800/50 transition-all gap-3 sm:gap-0"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-3 h-3 rounded-full ${club.actif ? 'bg-green-500 shadow-lg shadow-green-500/50' : 'bg-gray-600'}`}></div>
-                    <div>
-                      <div className="font-semibold text-white text-lg">{club.nom}</div>
-                      <div className="text-sm text-gray-500">ID: {club.id}</div>
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${club.actif ? 'bg-green-500 shadow-lg shadow-green-500/50' : 'bg-gray-600'}`}></div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-white text-base sm:text-lg truncate">{club.nom}</div>
+                      <div className="text-xs sm:text-sm text-gray-500 truncate">ID: {club.id}</div>
                     </div>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
                     <a
                       href={`/${club.id}/admin`}
-                      className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-blue-500/20"
+                      className="flex-1 sm:flex-none text-center px-3 sm:px-5 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-medium transition-all shadow-lg shadow-blue-500/20 whitespace-nowrap"
                     >
                       Admin Club
                     </a>
                     <a
                       href={`/${club.id}`}
-                      className="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-xl text-sm font-medium transition-all"
+                      className="flex-1 sm:flex-none text-center px-3 sm:px-5 py-2 sm:py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap"
                       target="_blank"
                       rel="noopener noreferrer"
                     >

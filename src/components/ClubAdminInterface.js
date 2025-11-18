@@ -37,38 +37,38 @@ const ClubAdminInterface = ({ clubId }) => {
 
   if (!canAccessClub(clubId)) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6">
-        <div className="max-w-md text-center">
-          <div className="w-20 h-20 mx-auto mb-8 rounded-full bg-red-500/10 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-full border-4 border-red-500"></div>
+      <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
+        <div className="max-w-md w-full text-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 rounded-full bg-red-500/10 flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-red-500"></div>
           </div>
-          <h1 className="text-3xl font-bold mb-4 text-red-500 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-red-500 tracking-tight">
             Accès Refusé
           </h1>
-          <p className="text-lg text-gray-400 mb-4">
+          <p className="text-base sm:text-lg text-gray-400 mb-3 sm:mb-4">
             Vous n'avez pas les permissions pour accéder à l'administration de <strong className="text-white">{clubId}</strong>.
           </p>
-          <p className="text-sm text-gray-500 mb-8">
+          <p className="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8 truncate">
             Connecté en tant que : {user?.email}
           </p>
           <div className="flex flex-col gap-3">
             {isSuperAdmin() && (
               <a
                 href="/admin"
-                className="px-8 py-4 rounded-xl font-semibold text-lg transition-all bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
+                className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
               >
                 Retour Dashboard
               </a>
             )}
             <button
               onClick={handleLogout}
-              className="px-8 py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold text-lg transition-all"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold text-base sm:text-lg transition-all"
             >
               Se déconnecter
             </button>
             <a
               href={`/${clubId}`}
-              className="text-gray-500 hover:text-gray-300 text-sm mt-4 transition-colors"
+              className="text-gray-500 hover:text-gray-300 text-xs sm:text-sm mt-2 sm:mt-4 transition-colors"
             >
               Retour au menu client
             </a>
@@ -82,7 +82,7 @@ const ClubAdminInterface = ({ clubId }) => {
     <div className="min-h-screen bg-black">
       {/* HEADER */}
       <div className="bg-black/95 backdrop-blur-md shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight" style={{ color: '#00FF41' }}>
@@ -163,7 +163,7 @@ const ClubAdminInterface = ({ clubId }) => {
       </div>
 
       {/* CONTENU */}
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
         {activeTab === 'menu' && <MenuManager etablissementId={clubId} />}
         {activeTab === 'qrcodes' && <QRCodeGenerator etablissementId={clubId} />}
         {activeTab === 'settings' && <Settings etablissementId={clubId} />}

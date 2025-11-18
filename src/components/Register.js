@@ -115,20 +115,21 @@ const Register = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
         <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 mx-auto mb-8 rounded-full bg-green-500/10 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center">
-              <Check size={24} className="text-black" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 rounded-full bg-green-500/10 flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center">
+              <Check size={20} className="sm:hidden text-black" />
+              <Check size={24} className="hidden sm:block text-black" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold mb-4" style={{ color: '#00FF41' }}>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4" style={{ color: '#00FF41' }}>
             Inscription réussie !
           </h2>
-          <p className="text-gray-400 mb-6">
+          <p className="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6">
             Votre établissement a été créé avec succès.
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs sm:text-sm text-gray-500">
             Redirection vers votre dashboard...
           </p>
         </div>
@@ -137,19 +138,19 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-2xl">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3 tracking-tight" style={{ color: '#00FF41' }}>
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-3 tracking-tight" style={{ color: '#00FF41' }}>
             QuickBar
           </h1>
-          <p className="text-gray-400 text-lg">Créer votre compte établissement</p>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-gray-400 text-base sm:text-lg">Créer votre compte établissement</p>
+          <p className="text-xs sm:text-sm text-gray-600 mt-2">
             Commencez à accepter des commandes en quelques minutes
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Nom de l'établissement */}
           <div>
             <label htmlFor="establishmentName" className="block text-sm font-medium mb-3 text-gray-300">
@@ -294,14 +295,14 @@ const Register = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-5 rounded-xl font-semibold text-lg transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 sm:py-5 rounded-xl font-semibold text-base sm:text-lg transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Création en cours...' : 'Créer mon établissement'}
           </button>
         </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="mt-6 sm:mt-8 text-center">
+          <p className="text-xs sm:text-sm text-gray-500">
             Vous avez déjà un compte ?{' '}
             <a href="/admin/login" className="text-green-500 hover:text-green-400 font-medium transition-colors">
               Se connecter

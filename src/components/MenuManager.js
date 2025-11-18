@@ -289,29 +289,30 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
   }, {});
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header avec boutons */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold font-mono" style={{ color: '#00FF41' }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+        <h2 className="text-lg sm:text-2xl font-bold font-mono" style={{ color: '#00FF41' }}>
           GESTION DU MENU ({menuItems.length} items)
         </h2>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
           {/* Télécharger template */}
           <button
             onClick={downloadTemplate}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-all flex items-center gap-2"
+            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 text-xs sm:text-sm"
           >
-            <Download size={18} />
-            Template CSV
+            <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <span className="hidden sm:inline">Template CSV</span>
+            <span className="sm:hidden">Template</span>
           </button>
           {/* Import CSV */}
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={importing}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
           >
-            <Upload size={18} />
-            {importing ? 'Import...' : 'Importer CSV'}
+            <Upload size={16} className="sm:w-[18px] sm:h-[18px]" />
+            {importing ? 'Import...' : <><span className="hidden sm:inline">Importer CSV</span><span className="sm:hidden">Import</span></>}
           </button>
           <input
             ref={fileInputRef}
@@ -323,9 +324,9 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
           {/* Ajouter item */}
           <button
             onClick={() => setShowAddForm(true)}
-            className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg shadow-green-500/30"
+            className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/30 text-xs sm:text-sm"
           >
-            <Plus size={18} />
+            <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
             Ajouter un item
           </button>
         </div>
@@ -350,17 +351,17 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
 
       {/* Formulaire d'ajout */}
       {showAddForm && (
-        <div className="p-4 border rounded-lg" style={{ borderColor: '#00FF41' }}>
-          <h3 className="text-lg font-bold mb-4 font-mono" style={{ color: '#00FF41' }}>
+        <div className="p-3 sm:p-4 border rounded-lg" style={{ borderColor: '#00FF41' }}>
+          <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 font-mono" style={{ color: '#00FF41' }}>
             Nouvel Item
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <input
               type="text"
               placeholder="Nom de l'item"
               value={newItem.name}
               onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-              className="px-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300"
+              className="px-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300 text-sm sm:text-base"
               style={{ borderColor: '#00FF41', color: '#00FF41' }}
               autoFocus
             />
@@ -370,25 +371,25 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
               placeholder="Prix ($)"
               value={newItem.price}
               onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
-              className="px-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300"
+              className="px-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300 text-sm sm:text-base"
               style={{ borderColor: '#00FF41', color: '#00FF41' }}
             />
             <select
               value={newItem.category}
               onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-              className="px-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300"
+              className="px-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300 text-sm sm:text-base"
               style={{ borderColor: '#00FF41', color: '#00FF41' }}
             >
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.label}</option>
               ))}
             </select>
-            <div className="flex gap-2">
+            <div className="flex gap-2 sm:col-span-1 col-span-1">
               <button
                 onClick={handleAddItem}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-mono flex items-center gap-1"
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-mono flex items-center justify-center gap-1 text-xs sm:text-sm"
               >
-                <Save size={16} />
+                <Save size={14} className="sm:w-4 sm:h-4" />
                 Ajouter
               </button>
               <button
@@ -396,10 +397,10 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
                   setShowAddForm(false);
                   setNewItem({ name: '', price: '', category: 'plat' });
                 }}
-                className="px-4 py-2 border rounded hover:bg-gray-900 font-mono flex items-center gap-1"
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border rounded hover:bg-gray-900 font-mono flex items-center justify-center gap-1 text-xs sm:text-sm"
                 style={{ borderColor: '#00FF41', color: '#00FF41' }}
               >
-                <X size={16} />
+                <X size={14} className="sm:w-4 sm:h-4" />
                 Annuler
               </button>
             </div>
@@ -414,22 +415,22 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
 
         return (
           <div key={category.id} className="border rounded-lg" style={{ borderColor: '#00FF41' }}>
-            <div className="p-4 border-b flex items-center gap-2" style={{ borderColor: '#00FF41' }}>
-              <CategoryIcon size={20} style={{ color: '#00FF41' }} />
-              <h3 className="text-lg font-bold font-mono" style={{ color: '#00FF41' }}>
+            <div className="p-3 sm:p-4 border-b flex items-center gap-2" style={{ borderColor: '#00FF41' }}>
+              <CategoryIcon size={18} className="sm:w-5 sm:h-5" style={{ color: '#00FF41' }} />
+              <h3 className="text-base sm:text-lg font-bold font-mono" style={{ color: '#00FF41' }}>
                 {category.label} ({items.length})
               </h3>
             </div>
 
-            <div className="p-4">
+            <div className="p-3 sm:p-4">
               {items.length === 0 ? (
                 <p className="text-gray-500 italic font-mono">Aucun item dans cette catégorie</p>
               ) : (
                 <div className="space-y-2">
                   {items.map(item => (
-                    <div 
-                      key={item.id} 
-                      className={`flex items-center justify-between p-3 rounded border ${
+                    <div
+                      key={item.id}
+                      className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 sm:p-3 rounded border gap-2 sm:gap-0 ${
                         !item.available ? 'opacity-50' : ''
                       }`}
                       style={{ borderColor: '#00FF41', backgroundColor: 'rgba(0, 255, 65, 0.02)' }}
@@ -437,12 +438,12 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
                       {editingItem && editingItem.id === item.id ? (
                         // Mode édition
                         <>
-                          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                          <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                             <input
                               type="text"
                               value={editingItem.name}
                               onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                              className="px-2 py-1 bg-black border font-mono"
+                              className="px-2 py-1 bg-black border font-mono text-xs sm:text-sm"
                               style={{ borderColor: '#00FF41', color: '#00FF41' }}
                             />
                             <input
@@ -450,13 +451,13 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
                               step="0.01"
                               value={editingItem.price}
                               onChange={(e) => setEditingItem({ ...editingItem, price: e.target.value })}
-                              className="px-2 py-1 bg-black border font-mono"
+                              className="px-2 py-1 bg-black border font-mono text-xs sm:text-sm"
                               style={{ borderColor: '#00FF41', color: '#00FF41' }}
                             />
                             <select
                               value={editingItem.category}
                               onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                              className="px-2 py-1 bg-black border font-mono"
+                              className="px-2 py-1 bg-black border font-mono text-xs sm:text-sm"
                               style={{ borderColor: '#00FF41', color: '#00FF41' }}
                             >
                               {categories.map(cat => (
@@ -464,69 +465,71 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
                               ))}
                             </select>
                           </div>
-                          <div className="flex items-center gap-2 ml-4">
+                          <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-4">
                             <button
                               onClick={handleSaveEdit}
-                              className="p-2 bg-green-600 hover:bg-green-700 text-white rounded"
+                              className="flex-1 sm:flex-none p-2 bg-green-600 hover:bg-green-700 text-white rounded"
                               title="Sauvegarder"
                             >
-                              <Save size={16} />
+                              <Save size={14} className="sm:w-4 sm:h-4" />
                             </button>
                             <button
                               onClick={() => setEditingItem(null)}
-                              className="p-2 border rounded hover:bg-gray-900"
+                              className="flex-1 sm:flex-none p-2 border rounded hover:bg-gray-900"
                               style={{ borderColor: '#00FF41', color: '#00FF41' }}
                               title="Annuler"
                             >
-                              <X size={16} />
+                              <X size={14} className="sm:w-4 sm:h-4" />
                             </button>
                           </div>
                         </>
                       ) : (
                         // Mode affichage
                         <>
-                          <div className="flex-1">
-                            <span className="font-mono text-lg" style={{ color: '#00FF41' }}>
-                              {item.name}
-                            </span>
-                            <span className="ml-4 font-mono" style={{ color: '#00FF41' }}>
-                              ${item.price.toFixed(2)}
-                            </span>
-                            {!item.available && (
-                              <span className="ml-4 text-sm font-mono text-red-400">
-                                (Indisponible)
+                          <div className="flex-1 min-w-0 w-full">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                              <span className="font-mono text-sm sm:text-base truncate" style={{ color: '#00FF41' }}>
+                                {item.name}
                               </span>
-                            )}
+                              <span className="font-mono text-sm sm:text-base whitespace-nowrap" style={{ color: '#00FF41' }}>
+                                ${item.price.toFixed(2)}
+                              </span>
+                              {!item.available && (
+                                <span className="text-xs sm:text-sm font-mono text-red-400 whitespace-nowrap">
+                                  (Indisponible)
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto flex-wrap">
                             {/* Toggle disponibilité */}
                             <button
                               onClick={() => toggleAvailability(item)}
-                              className={`px-3 py-1 rounded font-mono text-sm ${
-                                item.available 
-                                  ? 'bg-green-600 hover:bg-green-700 text-white' 
+                              className={`px-2 sm:px-3 py-1 rounded font-mono text-xs sm:text-sm whitespace-nowrap ${
+                                item.available
+                                  ? 'bg-green-600 hover:bg-green-700 text-white'
                                   : 'bg-gray-600 hover:bg-gray-700 text-white'
                               }`}
                             >
-                              {item.available ? 'Disponible' : 'Indisponible'}
+                              {item.available ? <span className="hidden sm:inline">Disponible</span><span className="sm:hidden">Dispo</span> : <span className="hidden sm:inline">Indisponible</span><span className="sm:hidden">Indisp</span>}
                             </button>
                             {/* Éditer */}
                             <button
                               onClick={() => startEdit(item)}
-                              className="p-2 border rounded hover:bg-gray-900"
+                              className="p-1.5 sm:p-2 border rounded hover:bg-gray-900"
                               style={{ borderColor: '#00FF41', color: '#00FF41' }}
                               title="Modifier"
                             >
-                              <Edit2 size={16} />
+                              <Edit2 size={14} className="sm:w-4 sm:h-4" />
                             </button>
                             {/* Supprimer */}
                             <button
                               onClick={() => handleDelete(item.id, item.name)}
-                              className="p-2 border rounded hover:bg-red-900"
+                              className="p-1.5 sm:p-2 border rounded hover:bg-red-900"
                               style={{ borderColor: '#ff4141', color: '#ff4141' }}
                               title="Supprimer"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={14} className="sm:w-4 sm:h-4" />
                             </button>
                           </div>
                         </>

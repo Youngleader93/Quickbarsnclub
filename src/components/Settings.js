@@ -127,23 +127,23 @@ const Settings = ({ etablissementId }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold font-mono" style={{ color: '#00FF41' }}>
+          <h2 className="text-lg sm:text-2xl font-bold font-mono" style={{ color: '#00FF41' }}>
             PARAMÈTRES
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Configuration de votre établissement
           </p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-5 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
         >
-          <Save size={18} />
+          <Save size={16} className="sm:w-[18px] sm:h-[18px]" />
           {saving ? 'Sauvegarde...' : 'Sauvegarder'}
         </button>
       </div>
@@ -164,64 +164,64 @@ const Settings = ({ etablissementId }) => {
       )}
 
       {/* Informations générales */}
-      <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-        <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-          <MapPin size={20} style={{ color: '#00FF41' }} />
+      <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
+          <MapPin size={18} className="sm:w-5 sm:h-5" style={{ color: '#00FF41' }} />
           Informations générales
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">
               Nom de l'établissement
             </label>
             <input
               type="text"
               value={settings.nom}
               onChange={(e) => setSettings({ ...settings, nom: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
               placeholder="Le Nightclub Bar"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
-              <Mail size={16} className="inline mr-1" />
+            <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">
+              <Mail size={14} className="sm:w-4 sm:h-4 inline mr-1" />
               Email
             </label>
             <input
               type="email"
               value={settings.email}
               onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
               placeholder="contact@nightclub.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
-              <MapPin size={16} className="inline mr-1" />
+            <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">
+              <MapPin size={14} className="sm:w-4 sm:h-4 inline mr-1" />
               Adresse
             </label>
             <input
               type="text"
               value={settings.adresse}
               onChange={(e) => setSettings({ ...settings, adresse: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
               placeholder="123 Main Street, New York"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
-              <Phone size={16} className="inline mr-1" />
+            <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">
+              <Phone size={14} className="sm:w-4 sm:h-4 inline mr-1" />
               Téléphone
             </label>
             <input
               type="tel"
               value={settings.telephone}
               onChange={(e) => setSettings({ ...settings, telephone: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
               placeholder="+1 (555) 123-4567"
             />
           </div>
@@ -229,45 +229,45 @@ const Settings = ({ etablissementId }) => {
       </div>
 
       {/* Horaires d'ouverture */}
-      <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-        <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-          <Clock size={20} style={{ color: '#00FF41' }} />
+      <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
+          <Clock size={18} className="sm:w-5 sm:h-5" style={{ color: '#00FF41' }} />
           Horaires d'ouverture
         </h3>
 
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {jours.map((jour) => (
-            <div key={jour} className="flex items-center gap-4 p-3 bg-gray-800/30 rounded-xl">
-              <div className="w-32">
+            <div key={jour} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-2.5 sm:p-3 bg-gray-800/30 rounded-xl">
+              <div className="w-full sm:w-32">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={settings.horaires[jour].ouvert}
                     onChange={(e) => updateHoraire(jour, 'ouvert', e.target.checked)}
-                    className="w-5 h-5 rounded bg-gray-700 border-gray-600 text-green-500 focus:ring-green-500"
+                    className="w-4 h-4 sm:w-5 sm:h-5 rounded bg-gray-700 border-gray-600 text-green-500 focus:ring-green-500"
                   />
-                  <span className="text-white font-medium">{joursLabels[jour]}</span>
+                  <span className="text-white font-medium text-sm sm:text-base">{joursLabels[jour]}</span>
                 </label>
               </div>
 
               {settings.horaires[jour].ouvert ? (
-                <div className="flex items-center gap-3 flex-1">
+                <div className="flex items-center gap-2 sm:gap-3 flex-1 w-full">
                   <input
                     type="time"
                     value={settings.horaires[jour].debut}
                     onChange={(e) => updateHoraire(jour, 'debut', e.target.value)}
-                    className="px-3 py-2 bg-gray-900/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-900/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-xs sm:text-sm"
                   />
-                  <span className="text-gray-500">→</span>
+                  <span className="text-gray-500 text-sm sm:text-base">→</span>
                   <input
                     type="time"
                     value={settings.horaires[jour].fin}
                     onChange={(e) => updateHoraire(jour, 'fin', e.target.value)}
-                    className="px-3 py-2 bg-gray-900/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-900/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-xs sm:text-sm"
                   />
                 </div>
               ) : (
-                <span className="text-gray-600 italic">Fermé</span>
+                <span className="text-gray-600 italic text-xs sm:text-sm">Fermé</span>
               )}
             </div>
           ))}
@@ -275,15 +275,15 @@ const Settings = ({ etablissementId }) => {
       </div>
 
       {/* WiFi */}
-      <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-        <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
-          <Wifi size={20} style={{ color: '#00FF41' }} />
+      <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
+          <Wifi size={18} className="sm:w-5 sm:h-5" style={{ color: '#00FF41' }} />
           Informations WiFi
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">
               Nom du réseau WiFi
             </label>
             <input
@@ -293,13 +293,13 @@ const Settings = ({ etablissementId }) => {
                 ...settings,
                 wifi: { ...settings.wifi, nom: e.target.value }
               })}
-              className="w-full px-4 py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
               placeholder="NightClub_WiFi"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">
               Mot de passe WiFi
             </label>
             <input
@@ -309,14 +309,14 @@ const Settings = ({ etablissementId }) => {
                 ...settings,
                 wifi: { ...settings.wifi, motDePasse: e.target.value }
               })}
-              className="w-full px-4 py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
               placeholder="••••••••"
             />
           </div>
         </div>
 
-        <div className="mt-4 p-3 bg-blue-500/10 rounded-xl">
-          <p className="text-sm text-blue-400">
+        <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-blue-500/10 rounded-xl">
+          <p className="text-xs sm:text-sm text-blue-400">
             Ces informations seront affichées aux clients sur la page d'accueil
           </p>
         </div>
