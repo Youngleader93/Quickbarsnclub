@@ -13,6 +13,7 @@ import ClubsManager from './components/ClubsManager';
 import UsersManager from './components/UsersManager';
 import ShowUID from './components/ShowUID';
 import LanguageSelector from './components/LanguageSelector';
+import ClubRegistrationForm from './components/ClubRegistrationForm';
 
 // Wrapper pour la logique principale avec auth
 const RestaurantOrderSystemWithAuth = () => {
@@ -29,6 +30,11 @@ const RestaurantOrderSystemWithAuth = () => {
   // Route d'inscription pour nouveaux établissements
   if (firstPart === 'register') {
     return <Register />;
+  }
+
+  // Route d'inscription des clubs (formulaire public)
+  if (firstPart === 'register-club') {
+    return <ClubRegistrationForm />;
   }
 
   // Routes admin

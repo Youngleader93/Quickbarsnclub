@@ -3,12 +3,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRole } from '../contexts/RoleContext';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
+import PendingClubRequests from './PendingClubRequests';
 
 const SuperAdminInterface = () => {
   const { user, logout } = useAuth();
   const { isSuperAdmin, userRole, displayName, loading: roleLoading, reloadRole } = useRole();
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState({
     totalClubs: 0,
     activeClubs: 0,
@@ -131,12 +133,26 @@ const SuperAdminInterface = () => {
       <div className="bg-gray-900/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2">
-            <a
-              href="/admin"
-              className="px-5 sm:px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-black rounded-xl font-semibold shadow-lg shadow-green-500/30 whitespace-nowrap text-sm sm:text-base min-h-[44px] flex items-center"
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`px-5 sm:px-6 py-3 rounded-xl font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] flex items-center transition-all ${
+                activeTab === 'dashboard'
+                  ? 'bg-gradient-to-r from-green-600 to-green-500 text-black shadow-lg shadow-green-500/30'
+                  : 'hover:bg-gray-800/50 text-gray-300 hover:text-white font-medium'
+              }`}
             >
               Dashboard
-            </a>
+            </button>
+            <button
+              onClick={() => setActiveTab('requests')}
+              className={`px-5 sm:px-6 py-3 rounded-xl font-semibold whitespace-nowrap text-sm sm:text-base min-h-[44px] flex items-center transition-all ${
+                activeTab === 'requests'
+                  ? 'bg-gradient-to-r from-green-600 to-green-500 text-black shadow-lg shadow-green-500/30'
+                  : 'hover:bg-gray-800/50 text-gray-300 hover:text-white font-medium'
+              }`}
+            >
+              Demandes
+            </button>
             <a
               href="/admin/clubs"
               className="px-5 sm:px-6 py-3 hover:bg-gray-800/50 text-gray-300 hover:text-white rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base min-h-[44px] flex items-center"
@@ -153,8 +169,11 @@ const SuperAdminInterface = () => {
         </div>
       </div>
 
-      {/* STATS GLOBALES */}
+      {/* CONTENU PRINCIPAL */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {activeTab === 'dashboard' && (
+          <>
+        {/* STATS GLOBALES */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-xl">
             <div className="text-gray-500 text-xs sm:text-sm mb-2">Total Clubs</div>
@@ -221,6 +240,12 @@ const SuperAdminInterface = () => {
             )}
           </div>
         </div>
+          </>
+        )}
+
+        {activeTab === 'requests' && (
+          <PendingClubRequests />
+        )}
       </div>
     </div>
   );

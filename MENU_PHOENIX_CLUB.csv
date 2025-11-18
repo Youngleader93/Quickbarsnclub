@@ -1,0 +1,51 @@
+Catégorie,Nom,Prix,Description,Disponible
+Cocktails,Mojito,12,Rhum blanc - Menthe - Citron vert - Sucre de canne,Oui
+Cocktails,Cosmopolitan,13,Vodka - Cointreau - Cranberry - Citron vert,Oui
+Cocktails,Margarita,12,Tequila - Triple sec - Citron vert,Oui
+Cocktails,Sex on the Beach,11,Vodka - Pêche - Cranberry - Orange,Oui
+Cocktails,Piña Colada,13,Rhum blanc - Lait de coco - Ananas,Oui
+Cocktails,Caipirinha,11,Cachaça - Citron vert - Sucre de canne,Oui
+Cocktails,Long Island,14,5 alcools - Cola - Citron,Oui
+Cocktails,Mai Tai,13,Rhum ambré - Curaçao - Orgeat - Citron,Oui
+Cocktails,Daiquiri,12,Rhum blanc - Citron vert - Sucre,Oui
+Cocktails,Old Fashioned,15,Bourbon - Angostura - Sucre - Orange,Oui
+Cocktails,Negroni,14,Gin - Campari - Vermouth rouge,Oui
+Cocktails,Moscow Mule,12,Vodka - Ginger beer - Citron vert,Oui
+Cocktails,Aperol Spritz,11,Aperol - Prosecco - Eau gazeuse,Oui
+Cocktails,Espresso Martini,14,Vodka - Kahlua - Café,Oui
+Cocktails,Blue Lagoon,12,Vodka - Curaçao bleu - Limonade,Oui
+Spiritueux,Vodka Grey Goose,10,4cl,Oui
+Spiritueux,Gin Hendricks,11,4cl,Oui
+Spiritueux,Rhum Diplomatico,12,4cl,Oui
+Spiritueux,Whisky Jack Daniels,11,4cl,Oui
+Spiritueux,Tequila Patron Silver,13,4cl,Oui
+Spiritueux,Cognac Hennessy VS,15,4cl,Oui
+Spiritueux,Bourbon Woodford Reserve,14,4cl,Oui
+Spiritueux,Vodka Belvedere,12,4cl,Oui
+Spiritueux,Gin Bombay Sapphire,10,4cl,Oui
+Spiritueux,Rhum Bacardi 8 ans,11,4cl,Oui
+Softs,Coca-Cola,5,33cl,Oui
+Softs,Coca-Cola Zero,5,33cl,Oui
+Softs,Sprite,5,33cl,Oui
+Softs,Fanta,5,33cl,Oui
+Softs,Red Bull,7,25cl,Oui
+Softs,Jus d'Orange,6,25cl,Oui
+Softs,Jus de Cranberry,6,25cl,Oui
+Softs,Eau Perrier,5,33cl,Oui
+Softs,Eau Plate,4,50cl,Oui
+Softs,Tonic Schweppes,5,20cl,Oui
+Shots,Jägermeister,6,4cl,Oui
+Shots,Tequila shot,7,4cl,Oui
+Shots,Vodka shot,6,4cl,Oui
+Shots,B52,8,Kahlua - Baileys - Grand Marnier,Oui
+Shots,Kamikaze,7,Vodka - Triple sec - Citron,Oui
+Bières,Heineken,7,33cl,Oui
+Bières,Corona,8,33cl,Oui
+Bières,Desperados,8,33cl,Oui
+Bières,Leffe Blonde,7,33cl,Oui
+Bières,Hoegaarden,7,33cl,Oui
+Champagne,Moët & Chandon,150,75cl,Oui
+Champagne,Veuve Clicquot,180,75cl,Oui
+Champagne,Dom Pérignon,350,75cl,Oui
+Bouteilles,Vodka Grey Goose,250,70cl,Oui
+Bouteilles,Champagne Rosé,200,75cl,Oui
