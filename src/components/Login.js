@@ -51,53 +51,41 @@ const Login = ({ onLoginSuccess }) => {
   const displayError = localError || authError;
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="text-xl mb-4 font-mono" style={{ color: '#00FF41' }}>
-            ╔════════════════════════════════════╗
-          </div>
-          <div className="text-xl mb-4 font-mono" style={{ color: '#00FF41' }}>
-            ║  QUICKBAR ADMIN v1.0              ║
-          </div>
-          <div className="text-xl mb-4 font-mono" style={{ color: '#00FF41' }}>
-            ╚════════════════════════════════════╝
-          </div>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-3 tracking-tight" style={{ color: '#00FF41' }}>
+            QuickBar Admin
+          </h1>
+          <p className="text-gray-500 text-sm">Connexion administrateur</p>
           {returnUrl && (
-            <div className="mt-4 p-3 border rounded" style={{ borderColor: '#00FF41', backgroundColor: 'rgba(0, 255, 65, 0.1)' }}>
-              <div className="text-xs text-gray-400 mb-1">Redirection après connexion :</div>
-              <div className="text-sm font-mono" style={{ color: '#00FF41' }}>
+            <div className="mt-6 p-4 bg-green-500/5 backdrop-blur-sm rounded-xl">
+              <div className="text-xs text-gray-500 mb-2">Redirection après connexion</div>
+              <div className="text-sm font-medium" style={{ color: '#00FF41' }}>
                 {returnUrl}
               </div>
             </div>
           )}
         </div>
 
-        {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label 
-              htmlFor="email" 
-              className="block text-sm font-mono mb-2"
-              style={{ color: '#00FF41' }}
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium mb-3 text-gray-300"
             >
-              &gt; Email administrateur
+              Email
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail size={18} style={{ color: '#00FF41' }} />
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Mail size={20} className="text-gray-600" />
               </div>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300"
-                style={{ 
-                  borderColor: '#00FF41', 
-                  color: '#00FF41'
-                }}
+                className="w-full pl-12 pr-4 py-4 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all disabled:opacity-50"
                 placeholder="admin@quickbar.com"
                 disabled={isLoading}
               />
@@ -105,67 +93,56 @@ const Login = ({ onLoginSuccess }) => {
           </div>
 
           <div>
-            <label 
-              htmlFor="password" 
-              className="block text-sm font-mono mb-2"
-              style={{ color: '#00FF41' }}
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium mb-3 text-gray-300"
             >
-              &gt; Mot de passe
+              Mot de passe
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock size={18} style={{ color: '#00FF41' }} />
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Lock size={20} className="text-gray-600" />
               </div>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300"
-                style={{ 
-                  borderColor: '#00FF41', 
-                  color: '#00FF41'
-                }}
+                className="w-full pl-12 pr-4 py-4 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all disabled:opacity-50"
                 placeholder="••••••••"
                 disabled={isLoading}
               />
             </div>
           </div>
 
-          {/* Error Message */}
           {displayError && (
-            <div 
-              className="p-3 border rounded flex items-center gap-2"
-              style={{ 
-                borderColor: '#ff4141',
-                backgroundColor: 'rgba(255, 65, 65, 0.1)'
-              }}
-            >
-              <AlertCircle size={18} style={{ color: '#ff4141' }} />
-              <span className="text-sm font-mono" style={{ color: '#ff4141' }}>
+            <div className="p-4 bg-red-500/10 backdrop-blur-sm rounded-xl flex items-center gap-3">
+              <AlertCircle size={20} className="text-red-400 flex-shrink-0" />
+              <span className="text-sm text-red-400">
                 {displayError}
               </span>
             </div>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 font-mono font-bold text-black rounded transition-opacity hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ 
-              backgroundColor: '#00FF41'
-            }}
+            className="w-full py-5 rounded-xl font-semibold text-lg transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'CONNEXION...' : 'SE CONNECTER'}
+            {isLoading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
 
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <div className="text-xs font-mono" style={{ color: '#00FF41', opacity: 0.6 }}>
+        <div className="mt-8 text-center space-y-3">
+          <p className="text-sm text-gray-500">
+            Vous n'avez pas encore de compte ?{' '}
+            <a href="/register" className="text-green-500 hover:text-green-400 font-medium transition-colors">
+              Créer un établissement
+            </a>
+          </p>
+          <p className="text-xs text-gray-600">
             Accès réservé aux administrateurs
-          </div>
+          </p>
         </div>
       </div>
     </div>

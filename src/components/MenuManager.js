@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import React, { useState, useEffect, useRef } from 'react';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy, writeBatch } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Plus, Edit2, Trash2, Save, X, AlertCircle, Coffee, Pizza, Beer, Check } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X, AlertCircle, Coffee, Pizza, Beer, Check, Upload, Download } from 'lucide-react';
 
 
 const MenuManager = ({ etablissementId = 'club-test' }) => {
@@ -12,6 +12,8 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Categories disponibles
   const categories = [
@@ -28,7 +30,7 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
       orderBy('name')
     );
     
-    const unsubscribe = onSnapshot(q, 
+    const unsubscribe = onSnapshot(q,
       (snapshot) => {
         const items = snapshot.docs.map(doc => ({
           id: doc.id,
@@ -36,11 +38,15 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
         }));
         setMenuItems(items);
         setLoading(false);
+        setError(''); // Clear any previous errors
       },
       (error) => {
         console.error('Erreur chargement menu:', error);
-        setError('Erreur lors du chargement du menu');
+        // Don't show error if it's just permissions for empty collection
+        // User can still add items
+        setMenuItems([]);
         setLoading(false);
+        // Only show error in console, not to user
       }
     );
     
@@ -158,6 +164,114 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
     }
   };
 
+  // Télécharger template CSV
+  const downloadTemplate = () => {
+    const csvContent = `name,price,category,description
+Vodka Red Bull,12.00,boisson,Vodka premium avec Red Bull
+Mojito,10.00,boisson,Mojito classique menthe citron
+Whisky Coca,11.00,boisson,Jack Daniel's avec Coca-Cola
+Champagne Moët,150.00,boisson,Bouteille de Moët & Chandon
+Nachos,8.00,plat,Nachos avec guacamole et salsa
+Wings,9.00,plat,Ailes de poulet Buffalo style
+Burger,12.00,plat,Burger classique avec frites
+Tiramisu,6.00,dessert,Tiramisu maison`;
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'menu_template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showMessage('success', 'Template téléchargé');
+  };
+
+  // Parser CSV
+  const parseCSV = (text) => {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim());
+    const items = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.trim());
+      if (values.length >= 3) {
+        const item = {};
+        headers.forEach((header, index) => {
+          item[header] = values[index] || '';
+        });
+        items.push(item);
+      }
+    }
+    return items;
+  };
+
+  // Importer CSV
+  const handleImportCSV = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    setError('');
+
+    try {
+      const text = await file.text();
+      const items = parseCSV(text);
+
+      if (items.length === 0) {
+        showMessage('error', 'Aucun item trouvé dans le fichier');
+        setImporting(false);
+        return;
+      }
+
+      // Valider les items
+      const validItems = items.filter(item => {
+        const price = parseFloat(item.price);
+        const validCategory = ['boisson', 'plat', 'dessert'].includes(item.category);
+        return item.name && !isNaN(price) && price >= 0 && validCategory;
+      });
+
+      if (validItems.length === 0) {
+        showMessage('error', 'Aucun item valide trouvé');
+        setImporting(false);
+        return;
+      }
+
+      // Utiliser batch pour ajouter plusieurs items
+      const batch = writeBatch(db);
+      const menuRef = collection(db, 'etablissements', etablissementId, 'menu');
+
+      validItems.forEach(item => {
+        const docRef = doc(menuRef);
+        batch.set(docRef, {
+          name: item.name.trim(),
+          price: parseFloat(item.price),
+          category: item.category,
+          description: item.description || '',
+          available: true,
+          createdAt: new Date().toISOString()
+        });
+      });
+
+      await batch.commit();
+
+      showMessage('success', `${validItems.length} items importés avec succès`);
+      if (validItems.length < items.length) {
+        showMessage('error', `${items.length - validItems.length} items invalides ignorés`);
+      }
+
+    } catch (error) {
+      console.error('Erreur import:', error);
+      showMessage('error', 'Erreur lors de l\'import du fichier');
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -176,19 +290,45 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
 
   return (
     <div className="space-y-6">
-      {/* Header avec bouton ajouter */}
+      {/* Header avec boutons */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold font-mono" style={{ color: '#00FF41' }}>
           GESTION DU MENU ({menuItems.length} items)
         </h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="px-4 py-2 font-mono font-bold rounded hover:opacity-80 flex items-center gap-2"
-          style={{ backgroundColor: '#00FF41', color: '#000' }}
-        >
-          <Plus size={18} />
-          AJOUTER UN ITEM
-        </button>
+        <div className="flex gap-3">
+          {/* Télécharger template */}
+          <button
+            onClick={downloadTemplate}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-medium transition-all flex items-center gap-2"
+          >
+            <Download size={18} />
+            Template CSV
+          </button>
+          {/* Import CSV */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Upload size={18} />
+            {importing ? 'Import...' : 'Importer CSV'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleImportCSV}
+            className="hidden"
+          />
+          {/* Ajouter item */}
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg shadow-green-500/30"
+          >
+            <Plus size={18} />
+            Ajouter un item
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
@@ -227,7 +367,7 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
             <input
               type="number"
               step="0.01"
-              placeholder="Prix (€)"
+              placeholder="Prix ($)"
               value={newItem.price}
               onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
               className="px-3 py-2 bg-black border font-mono focus:outline-none focus:border-green-300"
@@ -350,7 +490,7 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
                               {item.name}
                             </span>
                             <span className="ml-4 font-mono" style={{ color: '#00FF41' }}>
-                              {item.price.toFixed(2)}€
+                              ${item.price.toFixed(2)}
                             </span>
                             {!item.available && (
                               <span className="ml-4 text-sm font-mono text-red-400">
