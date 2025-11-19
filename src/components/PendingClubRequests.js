@@ -67,25 +67,24 @@ const PendingClubRequests = () => {
       // 3. Créer le compte admin
       const generatedPassword = generatePassword();
       let userCredential;
+      let userId;
 
       try {
         userCredential = await createUserWithEmailAndPassword(auth, request.email, generatedPassword);
+        userId = userCredential.user.uid;
       } catch (authError) {
-        // Si l'utilisateur existe déjà, continuer quand même
-        console.warn('Utilisateur existe déjà:', authError);
-        // On pourrait chercher l'utilisateur existant et l'utiliser
+        console.error('Erreur création compte Auth:', authError);
+        throw new Error(`Impossible de créer le compte: ${authError.message}`);
       }
 
-      // 4. Créer/Mettre à jour le document user
-      if (userCredential) {
-        await setDoc(doc(db, 'users', userCredential.user.uid), {
-          email: request.email,
-          role: 'club_admin',
-          etablissements: [request.etablissementId],
-          displayName: request.nom,
-          createdAt: serverTimestamp()
-        });
-      }
+      // 4. Créer le document user
+      await setDoc(doc(db, 'users', userId), {
+        email: request.email,
+        role: 'club_admin',
+        etablissements: [request.etablissementId],
+        displayName: request.nom,
+        createdAt: serverTimestamp()
+      });
 
       // 5. Marquer la demande comme approuvée
       await updateDoc(doc(db, 'club_requests', request.id), {
