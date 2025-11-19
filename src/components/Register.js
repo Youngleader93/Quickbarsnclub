@@ -144,7 +144,7 @@ const Register = () => {
           <h1 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-3 tracking-tight" style={{ color: '#00FF41' }}>
             QuickBar
           </h1>
-          <p className="text-gray-400 text-base sm:text-lg">Créer votre compte établissement</p>
+          <p className="text-gray-400 text-base sm:text-lg">Créer votre compte professionnel</p>
           <p className="text-xs sm:text-sm text-gray-600 mt-2">
             Commencez à accepter des commandes en quelques minutes
           </p>
