@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, doc, setDoc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, setDoc, addDoc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { db, auth } from '../firebase';
 import { Eye, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
@@ -53,8 +53,7 @@ const PendingClubRequests = () => {
       // 2. Importer le menu
       if (request.menuItems && request.menuItems.length > 0) {
         for (const item of request.menuItems) {
-          const itemRef = doc(collection(db, `menus/${request.etablissementId}/items`));
-          await setDoc(itemRef, {
+          await addDoc(collection(db, 'etablissements', request.etablissementId, 'menu'), {
             name: item.nom,
             price: item.prix,
             category: item.categorie,

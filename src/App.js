@@ -1009,7 +1009,7 @@ const TabletInterface = ({ etablissementId }) => {
           </div>
         )}
 
-        <div className="mb-6 sm:mb-8 text-center">
+        <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight" style={{
             color: '#00FF41',
             fontWeight: '600',
