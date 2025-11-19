@@ -160,14 +160,8 @@ const ClubRegistrationForm = () => {
             Demande envoyée !
           </h1>
           <p className="text-gray-300 mb-6">
-            Votre demande d'inscription a été envoyée avec succès. Nous allons l'examiner et vous contacterons très prochainement à l'adresse <strong>{formData.email}</strong>.
+            Votre demande d'inscription a été envoyée avec succès. Nous allons l'examiner et vous contacterons très prochainement.
           </p>
-          <button
-            onClick={() => setSuccess(false)}
-            className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all"
-          >
-            Soumettre une nouvelle demande
-          </button>
         </div>
       </div>
     );
