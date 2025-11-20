@@ -89,7 +89,8 @@ const ClubAdminInterface = ({ clubId }) => {
                 {displayName || user?.email || 'Admin'}
               </h1>
               <p className="text-sm text-gray-500">
-                {clubId} {isSuperAdmin() && <span className="text-yellow-400">• Super Admin</span>}
+                Club Admin • {user?.email}
+                {isSuperAdmin() && <span className="text-yellow-400"> • Super Admin</span>}
               </p>
             </div>
             <div className="flex gap-3 sm:gap-3 flex-wrap">

@@ -6,6 +6,8 @@ const ClubRegistrationForm = () => {
   const [formData, setFormData] = useState({
     etablissementId: '',
     nom: '',
+    gerantPrenom: '',
+    gerantNom: '',
     email: '',
     telephone: '',
     adresse: '',
@@ -107,7 +109,7 @@ const ClubRegistrationForm = () => {
 
     try {
       // Validation
-      if (!formData.etablissementId || !formData.nom || !formData.email || !formData.telephone) {
+      if (!formData.etablissementId || !formData.nom || !formData.gerantPrenom || !formData.gerantNom || !formData.email || !formData.telephone) {
         throw new Error('Veuillez remplir tous les champs obligatoires');
       }
 
@@ -216,6 +218,38 @@ const ClubRegistrationForm = () => {
                   required
                 />
                 <p className="text-xs text-gray-500 mt-1">Lettres minuscules et chiffres uniquement, sans espaces</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Prénom du gérant *
+                  </label>
+                  <input
+                    type="text"
+                    name="gerantPrenom"
+                    value={formData.gerantPrenom}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-green-500"
+                    placeholder="Marc"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Nom du gérant *
+                  </label>
+                  <input
+                    type="text"
+                    name="gerantNom"
+                    value={formData.gerantNom}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-green-500"
+                    placeholder="Dubois"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

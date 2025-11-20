@@ -78,11 +78,13 @@ const PendingClubRequests = () => {
       }
 
       // 4. Créer le document user
+      const displayName = `${request.gerantNom?.toUpperCase() || 'ADMIN'} ${request.gerantPrenom || ''}`.trim();
+
       await setDoc(doc(db, 'users', userId), {
         email: request.email,
         role: 'club_admin',
         etablissements: [request.etablissementId],
-        displayName: request.nom,
+        displayName: displayName,
         createdAt: serverTimestamp()
       });
 
