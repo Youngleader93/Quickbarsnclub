@@ -3,7 +3,7 @@ import { ShoppingCart, Check } from 'lucide-react';
 import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { RoleProvider } from './contexts/RoleContext';
+import { RoleProvider, useRole } from './contexts/RoleContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -18,10 +18,22 @@ import ClubRegistrationForm from './components/ClubRegistrationForm';
 // Wrapper pour la logique principale avec auth
 const RestaurantOrderSystemWithAuth = () => {
   const { user, loading } = useAuth();
+  const { userRole, clubAccess, isSuperAdmin, isInitialized } = useRole();
   const pathParts = window.location.pathname.split('/').filter(p => p);
   const firstPart = pathParts[0] || 'demo';
   const secondPart = pathParts[1] || '';
-  
+
+  // LOADER GLOBAL : Si user connecté mais rôles pas encore chargés, afficher loader
+  if (user && !isInitialized) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Chargement...
+        </div>
+      </div>
+    );
+  }
+
   // Route spéciale pour afficher UID (temporaire)
   if (firstPart === 'show-uid') {
     return <ShowUID />;
@@ -39,8 +51,8 @@ const RestaurantOrderSystemWithAuth = () => {
 
   // Routes admin
   if (firstPart === 'admin') {
-    // Si loading, afficher un loader
-    if (loading) {
+    // Si loading auth ou rôles pas initialisés, afficher un loader
+    if (loading || !isInitialized) {
       return (
         <div className="min-h-screen bg-black flex items-center justify-center">
           <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
@@ -143,8 +155,43 @@ const RestaurantOrderSystemWithAuth = () => {
       );
     }
 
-    // Si connecté, afficher SuperAdminInterface
-    return <SuperAdminInterface />;
+    // Si connecté, rediriger selon le rôle
+    // Super admin → SuperAdminInterface
+    if (isSuperAdmin()) {
+      return <SuperAdminInterface />;
+    }
+
+    // Club admin → rediriger vers son club
+    if (userRole === 'club_admin' && clubAccess && clubAccess.length > 0) {
+      // Si un seul club, rediriger directement
+      const clubId = clubAccess[0];
+      window.location.href = `/${clubId}/admin`;
+      return null;
+    }
+
+    // Si pas de rôle approprié, afficher accès refusé
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="max-w-md text-center">
+          <div className="text-6xl mb-8">🔒</div>
+          <div className="text-3xl font-bold mb-4 text-red-500">
+            Accès Refusé
+          </div>
+          <div className="text-lg text-gray-400 mb-4">
+            Vous n'avez pas les permissions pour accéder à cette page.
+          </div>
+          <div className="text-sm text-gray-500 mb-8">
+            Rôle actuel : {userRole || 'aucun'}
+          </div>
+          <a
+            href="/admin/login"
+            className="inline-block px-8 py-4 rounded-lg font-bold text-lg hover:opacity-80 bg-gradient-to-r from-green-600 to-green-500 text-black"
+          >
+            SE CONNECTER
+          </a>
+        </div>
+      </div>
+    );
   }
 
   // Routes publiques et club admin
@@ -153,8 +200,8 @@ const RestaurantOrderSystemWithAuth = () => {
 
   // Route /{club-id}/admin (Admin Club)
   if (page === 'admin') {
-    // Si loading, afficher un loader
-    if (loading) {
+    // Si loading auth ou rôles pas initialisés, afficher un loader
+    if (loading || !isInitialized) {
       return (
         <div className="min-h-screen bg-black flex items-center justify-center">
           <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
@@ -400,19 +447,29 @@ const ClientInterface = ({ etablissementId }) => {
   }, [etablissementId]);
 
   useEffect(() => {
+    console.log('🔍 Vue Client: Chargement menu pour:', etablissementId);
+
+    // Pas de orderBy pour éviter les conflits avec d'autres listeners
     const q = query(
-      collection(db, 'etablissements', etablissementId, 'menu'),
-      orderBy('name')
+      collection(db, 'etablissements', etablissementId, 'menu')
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      console.log('✅ Vue Client: Snapshot reçu, nombre de docs:', snapshot.docs.length);
       const menuItems = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
+
+      // Trier en mémoire par nom
+      menuItems.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+      console.log('📋 Vue Client: Items chargés et triés:', menuItems);
       setMenu(menuItems);
     }, (error) => {
-      console.error('Erreur chargement menu:', error);
+      console.error('❌ Vue Client: Erreur chargement menu:', error);
+      console.error('❌ Vue Client: Code erreur:', error.code);
+      console.error('❌ Vue Client: Message:', error.message);
     });
 
     return () => unsubscribe();
@@ -612,22 +669,22 @@ const ClientInterface = ({ etablissementId }) => {
     return (
       <div className="min-h-screen bg-black p-6 flex items-center justify-center">
         <div className="max-w-md w-full">
-          <h2 className="text-3xl font-semibold mb-8 text-center tracking-tight" style={{ color: '#00FF41' }}>
+          <h2 className="text-3xl font-light mb-8 text-center tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
             {t('addTip')}
           </h2>
 
-          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-xl">
-            <div className="flex justify-between mb-3 text-gray-300">
-              <span>{t('subtotal')}</span>
-              <span className="font-semibold" style={{ color: '#00FF41' }}>${subtotal.toFixed(2)}</span>
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-xl border border-gray-800/50">
+            <div className="flex justify-between mb-3 text-gray-300 text-base">
+              <span className="font-normal">{t('subtotal')}</span>
+              <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between mb-4 text-gray-300">
-              <span>{t('tip')}</span>
-              <span className="font-semibold" style={{ color: '#00FF41' }}>${tipAmount.toFixed(2)}</span>
+            <div className="flex justify-between mb-4 text-gray-300 text-base">
+              <span className="font-normal">{t('tip')}</span>
+              <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${tipAmount.toFixed(2)}</span>
             </div>
             <div className="pt-4 mt-4 border-t border-gray-700/50 flex justify-between text-2xl">
-              <span className="font-semibold text-white">{t('total')}</span>
-              <span className="font-bold" style={{ color: '#00FF41' }}>${total.toFixed(2)}</span>
+              <span className="font-normal text-white">{t('total')}</span>
+              <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${total.toFixed(2)}</span>
             </div>
           </div>
 
@@ -636,11 +693,12 @@ const ClientInterface = ({ etablissementId }) => {
               <button
                 key={percentage}
                 onClick={() => selectTipPercentage(percentage)}
-                className={`py-4 rounded-xl font-semibold transition-all duration-200 ${
+                className={`py-4 rounded-xl font-normal transition-all duration-200 hover:scale-105 ${
                   tipAmount === (subtotal * percentage) / 100
                     ? 'bg-gradient-to-r from-green-600 to-green-500 text-black shadow-lg shadow-green-500/30'
                     : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50'
                 }`}
+                style={{ fontWeight: '400' }}
               >
                 {percentage}% (${(subtotal * percentage / 100).toFixed(2)})
               </button>
@@ -653,8 +711,8 @@ const ClientInterface = ({ etablissementId }) => {
                 value={customTip}
                 onChange={(e) => handleCustomTipChange(e.target.value)}
                 placeholder={t('customAmount')}
-                className="w-full bg-gray-800/50 p-4 rounded-xl text-center font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-                style={{ color: '#00FF41' }}
+                className="w-full bg-gray-800/50 p-4 rounded-xl text-center font-light focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                style={{ color: '#00FF41', fontWeight: '300' }}
               />
               <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                 <span className="text-gray-500">$</span>
@@ -664,7 +722,8 @@ const ClientInterface = ({ etablissementId }) => {
 
           <button
             onClick={confirmOrderWithTip}
-            className="w-full py-5 rounded-xl font-semibold text-lg mb-3 transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
+            className="w-full py-5 rounded-xl font-normal text-lg mb-3 transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30 hover:scale-105"
+            style={{ fontWeight: '400' }}
           >
             {t('confirm')}
           </button>
@@ -675,7 +734,8 @@ const ClientInterface = ({ etablissementId }) => {
               setTipAmount(0);
               setCustomTip('');
             }}
-            className="w-full py-4 rounded-xl font-medium text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all"
+            className="w-full py-4 rounded-xl font-light text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all"
+            style={{ fontWeight: '300' }}
           >
             {t('back')}
           </button>
@@ -727,36 +787,36 @@ const ClientInterface = ({ etablissementId }) => {
               <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center pulse-animation shadow-2xl shadow-green-500/50">
                 <Check size={64} className="text-black" />
               </div>
-              <h1 className="text-4xl font-bold mb-6 tracking-tight" style={{ color: '#00FF41' }}>
+              <h1 className="text-4xl font-light mb-6 tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
                 {t('orderReady')}
               </h1>
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8 shadow-xl">
-                <p className="text-gray-400 text-sm mb-2">{t('orderNumber')}</p>
-                <p className="text-6xl font-bold mb-6" style={{ color: '#00FF41' }}>#{currentOrder.number}</p>
+              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8 shadow-xl border border-gray-800/50">
+                <p className="text-gray-400 text-sm mb-2 font-normal">{t('orderNumber')}</p>
+                <p className="text-6xl font-light mb-6" style={{ color: '#00FF41', fontWeight: '300', textShadow: '0 0 20px rgba(0, 255, 65, 0.3)' }}>#{currentOrder.number}</p>
                 <div className="h-px bg-gray-700/50 mb-6"></div>
-                <p className="text-gray-400 text-sm mb-2">{t('totalAmount')}</p>
-                <p className="text-3xl font-bold" style={{ color: '#00FF41' }}>${currentOrder.total.toFixed(2)}</p>
+                <p className="text-gray-400 text-sm mb-2 font-normal">{t('totalAmount')}</p>
+                <p className="text-3xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${currentOrder.total.toFixed(2)}</p>
               </div>
-              <p className="text-xl text-white font-medium">
+              <p className="text-lg text-gray-300 leading-relaxed font-normal" style={{ fontWeight: '400' }}>
                 {t('pickupOrder')}
               </p>
             </>
           ) : (
             <>
-              <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center shadow-2xl shadow-green-500/50">
+              <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center shadow-2xl shadow-green-500/50 animate-pulse">
                 <Check size={64} className="text-black" />
               </div>
-              <h1 className="text-4xl font-bold mb-6 tracking-tight" style={{ color: '#00FF41' }}>
+              <h1 className="text-4xl font-light mb-6 tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
                 {t('orderSent')}
               </h1>
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8 shadow-xl">
-                <p className="text-gray-400 text-sm mb-2">{t('orderNumber')}</p>
-                <p className="text-6xl font-bold mb-6" style={{ color: '#00FF41' }}>#{currentOrder.number}</p>
+              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8 shadow-xl border border-gray-800/50">
+                <p className="text-gray-400 text-sm mb-2 font-normal">{t('orderNumber')}</p>
+                <p className="text-6xl font-light mb-6" style={{ color: '#00FF41', fontWeight: '300', textShadow: '0 0 20px rgba(0, 255, 65, 0.3)' }}>#{currentOrder.number}</p>
                 <div className="h-px bg-gray-700/50 mb-6"></div>
-                <p className="text-gray-400 text-sm mb-2">{t('totalAmount')}</p>
-                <p className="text-3xl font-bold" style={{ color: '#00FF41' }}>${currentOrder.total.toFixed(2)}</p>
+                <p className="text-gray-400 text-sm mb-2 font-normal">{t('totalAmount')}</p>
+                <p className="text-3xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${currentOrder.total.toFixed(2)}</p>
               </div>
-              <p className="text-lg text-gray-300 leading-relaxed">
+              <p className="text-lg text-gray-300 leading-relaxed font-normal" style={{ fontWeight: '400' }}>
                 {t('notifiedWhenReady')}
               </p>
             </>
@@ -794,6 +854,15 @@ const ClientInterface = ({ etablissementId }) => {
       </div>
 
       <div className="sticky top-0 bg-black/95 backdrop-blur-md z-10 shadow-lg">
+        {/* Club name in absolute top-left */}
+        {etablissementName && (
+          <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
+            <h2 className="text-lg font-bold text-white">
+              {etablissementName}
+            </h2>
+          </div>
+        )}
+
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           {!ordersOpen && (
             <div className="mb-4 p-3 bg-red-500/10 rounded-xl text-center">
@@ -803,20 +872,12 @@ const ClientInterface = ({ etablissementId }) => {
             </div>
           )}
 
-          {/* Club name in top-left */}
-          {etablissementName && (
-            <div className="mb-4">
-              <h2 className="text-lg font-bold text-white">
-                {etablissementName}
-              </h2>
-            </div>
-          )}
-
           <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{
+            <h1 className="text-3xl sm:text-4xl font-light tracking-tight" style={{
               color: '#00FF41',
-              fontWeight: '600',
-              letterSpacing: '-0.02em'
+              fontWeight: '300',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase'
             }}>
               {t('menu')}
             </h1>
@@ -825,39 +886,124 @@ const ClientInterface = ({ etablissementId }) => {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-32">
-        <div className="space-y-3">
-          {menu.map(item => (
-            <div key={item.id} className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-5 hover:bg-gray-900/50 transition-all duration-200">
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-1" style={{ color: '#00FF41' }}>{item.name}</h3>
-                  <p className="text-2xl font-bold" style={{ color: '#00FF41' }}>${item.price.toFixed(2)}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => handleQuantityChange(item.id, Math.max(0, (quantities[item.id] || 0) - 1))}
-                    disabled={hasActiveOrder || !ordersOpen || !quantities[item.id]}
-                    className="w-10 h-10 rounded-xl bg-gray-800 text-white font-bold text-xl disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors"
-                  >
-                    −
-                  </button>
-                  <div className="w-12 text-center">
-                    <span className="text-2xl font-bold" style={{ color: '#00FF41' }}>
-                      {quantities[item.id] || 0}
+        {/* Grouper par catégorie */}
+        {(() => {
+          // Définir toutes les catégories possibles
+          const allCategories = [
+            'Cocktails', 'Softs', 'Bières', 'Vins',
+            'Champagne', 'Shots', 'Snacks', 'Plats', 'Desserts'
+          ];
+
+          // Grouper les items par catégorie
+          const itemsByCategory = {};
+          menu.forEach(item => {
+            const cat = item.category || 'Plats';
+            if (!itemsByCategory[cat]) {
+              itemsByCategory[cat] = [];
+            }
+            itemsByCategory[cat].push(item);
+          });
+
+          // Afficher seulement les catégories non vides dans l'ordre défini
+          return allCategories
+            .filter(cat => itemsByCategory[cat] && itemsByCategory[cat].length > 0)
+            .map((category, idx) => (
+              <div key={category} className="mb-10">
+                {/* En-tête de catégorie avec design amélioré */}
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full border-t border-gray-800"></div>
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="px-6 py-2 text-2xl font-medium tracking-wide uppercase bg-black"
+                          style={{
+                            color: '#00FF41',
+                            textShadow: '0 0 20px rgba(0, 255, 65, 0.3)',
+                            letterSpacing: '0.15em',
+                            fontWeight: '500'
+                          }}>
+                      {category}
                     </span>
                   </div>
-                  <button
-                    onClick={() => handleQuantityChange(item.id, Math.min(20, (quantities[item.id] || 0) + 1))}
-                    disabled={hasActiveOrder || !ordersOpen || (quantities[item.id] || 0) >= 20}
-                    className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-600 to-green-500 text-black font-bold text-xl disabled:opacity-30 disabled:cursor-not-allowed hover:from-green-500 hover:to-green-600 transition-all shadow-lg shadow-green-500/20"
-                  >
-                    +
-                  </button>
+                </div>
+
+                {/* Items de la catégorie avec design raffiné */}
+                <div className="space-y-4">
+                  {itemsByCategory[category].map(item => (
+                    <div
+                      key={item.id}
+                      className="group relative bg-gradient-to-br from-gray-900/40 to-gray-900/20 backdrop-blur-md rounded-2xl p-6 border border-gray-800/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10"
+                      style={{
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-6">
+                        {/* Info produit */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl font-normal mb-2 truncate transition-colors duration-200"
+                              style={{
+                                color: '#00FF41',
+                                textShadow: '0 0 10px rgba(0, 255, 65, 0.2)',
+                                fontWeight: '400',
+                                letterSpacing: '0.02em'
+                              }}>
+                            {item.name}
+                          </h3>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-3xl font-light tracking-tight"
+                                  style={{
+                                    color: '#00FF41',
+                                    textShadow: '0 0 15px rgba(0, 255, 65, 0.3)',
+                                    fontWeight: '300',
+                                    letterSpacing: '0.01em'
+                                  }}>
+                              ${item.price.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Contrôles quantité */}
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => handleQuantityChange(item.id, Math.max(0, (quantities[item.id] || 0) - 1))}
+                            disabled={hasActiveOrder || !ordersOpen || !quantities[item.id]}
+                            className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-600 to-green-500 text-black font-light text-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:from-green-500 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-green-500/40 hover:scale-105 active:scale-95"
+                            style={{ fontWeight: '400' }}
+                          >
+                            −
+                          </button>
+
+                          <div className="w-16 text-center">
+                            <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-black/50 border-2 border-green-500/30">
+                              <span className="text-3xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>
+                                {quantities[item.id] || 0}
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => handleQuantityChange(item.id, Math.min(20, (quantities[item.id] || 0) + 1))}
+                            disabled={hasActiveOrder || !ordersOpen || (quantities[item.id] || 0) >= 20}
+                            className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-600 to-green-500 text-black font-light text-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:from-green-500 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-green-500/40 hover:scale-105 active:scale-95"
+                            style={{ fontWeight: '400' }}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Effet de brillance au survol */}
+                      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                           style={{
+                             background: 'radial-gradient(circle at center, rgba(0, 255, 65, 0.03) 0%, transparent 70%)'
+                           }}>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ));
+        })()}
       </div>
 
       {getTotalItems() > 0 && !hasActiveOrder && (
@@ -1008,16 +1154,6 @@ const TabletInterface = ({ etablissementId }) => {
             </h2>
           </div>
         )}
-
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight" style={{
-            color: '#00FF41',
-            fontWeight: '600',
-            letterSpacing: '-0.02em'
-          }}>
-            Tablette de Gestion
-          </h1>
-        </div>
 
         <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">

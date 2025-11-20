@@ -19,6 +19,7 @@ export const RoleProvider = ({ children }) => {
   const [clubAccess, setClubAccess] = useState([]);
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState(null);
 
   const reloadRole = async () => {
@@ -44,7 +45,7 @@ export const RoleProvider = ({ children }) => {
       setUserRole(null);
       setClubAccess([]);
       setDisplayName('');
-      setLoading(false);
+      setTimeout(() => setLoading(false), 0);
       return;
     }
 
@@ -67,13 +68,15 @@ export const RoleProvider = ({ children }) => {
         } else {
           setClubAccess([]);
         }
-        setLoading(false);
+
+        // Mettre loading à false APRÈS que tous les autres états soient mis à jour
+        setTimeout(() => setLoading(false), 0);
       } else {
         // Si le document n'existe pas, considérer comme pas de rôle
         setUserRole(null);
         setClubAccess([]);
         setDisplayName('');
-        setLoading(false);
+        setTimeout(() => setLoading(false), 0);
       }
     } catch (error) {
       // Retry jusqu'à 3 fois en cas d'erreur réseau
@@ -83,14 +86,28 @@ export const RoleProvider = ({ children }) => {
         setUserRole(null);
         setClubAccess([]);
         setDisplayName('');
-        setLoading(false);
+        setTimeout(() => setLoading(false), 0);
       }
     }
   };
 
   useEffect(() => {
+    setIsInitialized(false);
     loadUserRole(0);
   }, [user]);
+
+  // Mettre isInitialized à true seulement quand tout est vraiment prêt
+  useEffect(() => {
+    if (!loading) {
+      // Attendre 150ms pour garantir que tous les états sont stables
+      const timer = setTimeout(() => {
+        setIsInitialized(true);
+      }, 150);
+      return () => clearTimeout(timer);
+    } else {
+      setIsInitialized(false);
+    }
+  }, [loading]);
 
   // Fonctions utilitaires
   const isSuperAdmin = () => userRole === 'super_admin';
@@ -103,6 +120,8 @@ export const RoleProvider = ({ children }) => {
   };
 
   const canAccessClub = (clubId) => {
+    // Si pas encore initialisé, ne pas bloquer l'accès (le loader global s'en charge)
+    if (!isInitialized) return true;
     return isSuperAdmin() || isClubAdmin(clubId);
   };
 
@@ -111,6 +130,7 @@ export const RoleProvider = ({ children }) => {
     clubAccess,
     displayName,
     loading,
+    isInitialized,
     error,
     isSuperAdmin,
     isClubAdmin,

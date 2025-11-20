@@ -7,29 +7,50 @@ import Settings from './Settings';
 
 const ClubAdminInterface = ({ clubId }) => {
   const { user, logout } = useAuth();
-  const { canAccessClub, isSuperAdmin, userRole, displayName, loading } = useRole();
-  const [activeTab, setActiveTab] = useState('menu');
+  const { canAccessClub, isSuperAdmin, userRole, displayName, isInitialized, clubAccess } = useRole();
+  // Initialiser avec null, puis définir selon le rôle dans useEffect
+  const [activeTab, setActiveTab] = useState(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     if (window.confirm('Voulez-vous vous déconnecter ?')) {
+      setIsLoggingOut(true);
       const result = await logout();
       if (result.success) {
-        // Rediriger vers login avec returnUrl pour revenir à ce club
-        const returnUrl = `/${clubId}/admin`;
-        window.location.href = `/admin/login?returnUrl=${encodeURIComponent(returnUrl)}`;
+        // Rediriger vers login sans returnUrl
+        window.location.href = '/admin/login';
       } else {
+        setIsLoggingOut(false);
         alert('Erreur lors de la déconnexion');
       }
     }
   };
 
-  // IMPORTANT : Attendre que le chargement soit terminé ET que les données soient chargées
-  // Ne pas afficher "Accès Refusé" si on est encore en train de charger
-  if (loading || (user && userRole === null)) {
+  // Définir l'onglet par défaut une fois le rôle chargé
+  React.useEffect(() => {
+    if (isInitialized && activeTab === null) {
+      // Tout le monde commence sur Menu
+      setActiveTab('menu');
+    }
+  }, [isInitialized, activeTab]);
+
+  // Si en train de se déconnecter, afficher loader
+  if (isLoggingOut) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
-          Chargement des permissions...
+          Déconnexion en cours...
+        </div>
+      </div>
+    );
+  }
+
+  // Attendre que tout soit initialisé ET que l'onglet par défaut soit défini
+  if (!isInitialized || activeTab === null) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Chargement...
         </div>
       </div>
     );
@@ -48,9 +69,15 @@ const ClubAdminInterface = ({ clubId }) => {
           <p className="text-base sm:text-lg text-gray-400 mb-3 sm:mb-4">
             Vous n'avez pas les permissions pour accéder à l'administration de <strong className="text-white">{clubId}</strong>.
           </p>
-          <p className="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8 truncate">
+          <p className="text-xs sm:text-sm text-gray-500 mb-2 truncate">
             Connecté en tant que : {user?.email}
           </p>
+          <div className="text-xs text-left bg-gray-800/50 p-3 rounded-lg mb-6 sm:mb-8">
+            <p className="text-gray-400">DEBUG INFO:</p>
+            <p className="text-yellow-400">Role: {userRole || 'null'}</p>
+            <p className="text-yellow-400">Club demandé: {clubId}</p>
+            <p className="text-yellow-400">Clubs autorisés: {JSON.stringify(clubAccess)}</p>
+          </div>
           <div className="flex flex-col gap-3">
             {isSuperAdmin() && (
               <a
@@ -89,7 +116,7 @@ const ClubAdminInterface = ({ clubId }) => {
                 {displayName || user?.email || 'Admin'}
               </h1>
               <p className="text-sm text-gray-500">
-                Club Admin • {user?.email}
+                Club Admin
                 {isSuperAdmin() && <span className="text-yellow-400"> • Super Admin</span>}
               </p>
             </div>

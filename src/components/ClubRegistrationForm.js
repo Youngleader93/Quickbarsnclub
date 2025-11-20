@@ -39,7 +39,6 @@ const ClubRegistrationForm = () => {
 
   const categories = [
     'Cocktails',
-    'Spiritueux',
     'Softs',
     'Bières',
     'Vins',

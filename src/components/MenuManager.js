@@ -8,40 +8,62 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
-  const [newItem, setNewItem] = useState({ name: '', price: '', category: 'plat' });
+  const [newItem, setNewItem] = useState({ name: '', price: '', category: 'Cocktails' });
   const [showAddForm, setShowAddForm] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Categories disponibles
+  // Categories disponibles (correspondant au formulaire d'inscription)
   const categories = [
-    { id: 'boisson', label: 'Boissons', icon: Beer },
-    { id: 'plat', label: 'Plats', icon: Pizza },
-    { id: 'dessert', label: 'Desserts', icon: Coffee }
+    { id: 'Cocktails', label: 'Cocktails' },
+    { id: 'Softs', label: 'Softs' },
+    { id: 'Bières', label: 'Bières' },
+    { id: 'Vins', label: 'Vins' },
+    { id: 'Champagne', label: 'Champagne' },
+    { id: 'Shots', label: 'Shots' },
+    { id: 'Snacks', label: 'Snacks' },
+    { id: 'Plats', label: 'Plats' },
+    { id: 'Desserts', label: 'Desserts' }
   ];
 
   // Charger les items du menu
   useEffect(() => {
+    console.log('🔍 MenuManager: Chargement menu pour:', etablissementId);
+
+    // Pas de orderBy pour éviter les conflits avec d'autres listeners
     const q = query(
-      collection(db, 'etablissements', etablissementId, 'menu'),
-      orderBy('category'),
-      orderBy('name')
+      collection(db, 'etablissements', etablissementId, 'menu')
     );
-    
+
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
+        console.log('✅ MenuManager: Snapshot reçu, nombre de docs:', snapshot.docs.length);
         const items = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
+
+        // Trier en mémoire au lieu d'utiliser orderBy Firestore
+        items.sort((a, b) => {
+          const catA = a.category || 'plat';
+          const catB = b.category || 'plat';
+          if (catA !== catB) {
+            return catA.localeCompare(catB);
+          }
+          return (a.name || '').localeCompare(b.name || '');
+        });
+
+        console.log('📋 MenuManager: Items chargés et triés:', items);
         setMenuItems(items);
         setLoading(false);
         setError(''); // Clear any previous errors
       },
       (error) => {
-        console.error('Erreur chargement menu:', error);
+        console.error('❌ MenuManager: Erreur chargement menu:', error);
+        console.error('❌ MenuManager: Code erreur:', error.code);
+        console.error('❌ MenuManager: Message:', error.message);
         // Don't show error if it's just permissions for empty collection
         // User can still add items
         setMenuItems([]);
@@ -49,7 +71,7 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
         // Only show error in console, not to user
       }
     );
-    
+
     return () => unsubscribe();
   }, [etablissementId]);
 
@@ -85,8 +107,8 @@ const MenuManager = ({ etablissementId = 'club-test' }) => {
         available: true,
         createdAt: new Date().toISOString()
       });
-      
-      setNewItem({ name: '', price: '', category: 'plat' });
+
+      setNewItem({ name: '', price: '', category: 'Cocktails' });
       setShowAddForm(false);
       showMessage('success', 'Item ajouté avec succès');
     } catch (error) {
@@ -284,7 +306,7 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
 
   // Grouper les items par catégorie
   const itemsByCategory = categories.reduce((acc, cat) => {
-    acc[cat.id] = menuItems.filter(item => (item.category || 'plat') === cat.id);
+    acc[cat.id] = menuItems.filter(item => (item.category || 'Plats') === cat.id);
     return acc;
   }, {});
 
@@ -395,7 +417,7 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
               <button
                 onClick={() => {
                   setShowAddForm(false);
-                  setNewItem({ name: '', price: '', category: 'plat' });
+                  setNewItem({ name: '', price: '', category: 'Cocktails' });
                 }}
                 className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border rounded hover:bg-gray-900 font-mono flex items-center justify-center gap-1 text-xs sm:text-sm"
                 style={{ borderColor: '#00FF41', color: '#00FF41' }}
@@ -410,13 +432,11 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
 
       {/* Liste des items par catégorie */}
       {categories.map(category => {
-        const CategoryIcon = category.icon;
         const items = itemsByCategory[category.id];
 
         return (
           <div key={category.id} className="border rounded-lg" style={{ borderColor: '#00FF41' }}>
             <div className="p-2.5 sm:p-3 border-b flex items-center gap-2" style={{ borderColor: '#00FF41' }}>
-              <CategoryIcon size={18} className="sm:w-5 sm:h-5" style={{ color: '#00FF41' }} />
               <h3 className="text-sm sm:text-base font-bold font-mono flex items-center gap-2" style={{ color: '#00FF41' }}>
                 {category.label} <span className="text-xs sm:text-sm font-normal bg-green-500/20 px-2 py-0.5 rounded">({items.length})</span>
               </h3>

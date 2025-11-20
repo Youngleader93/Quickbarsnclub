@@ -7,10 +7,11 @@ import PendingClubRequests from './PendingClubRequests';
 
 const SuperAdminInterface = () => {
   const { user, logout } = useAuth();
-  const { isSuperAdmin, userRole, displayName, loading: roleLoading, reloadRole } = useRole();
+  const { isSuperAdmin, userRole, displayName, isInitialized, reloadRole } = useRole();
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [stats, setStats] = useState({
     totalClubs: 0,
     activeClubs: 0,
@@ -48,17 +49,30 @@ const SuperAdminInterface = () => {
 
   const handleLogout = async () => {
     if (window.confirm('Voulez-vous vous déconnecter ?')) {
+      setIsLoggingOut(true);
       const result = await logout();
       if (result.success) {
         window.location.href = '/admin/login';
       } else {
+        setIsLoggingOut(false);
         alert('Erreur lors de la déconnexion');
       }
     }
   };
 
-  // Vérification permissions
-  if (roleLoading || loading) {
+  // Si en train de se déconnecter, afficher loader
+  if (isLoggingOut) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Déconnexion en cours...
+        </div>
+      </div>
+    );
+  }
+
+  // Attendre que tout soit initialisé ET que les clubs soient chargés
+  if (!isInitialized || loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
@@ -116,7 +130,7 @@ const SuperAdminInterface = () => {
                 NGALEU CHRISTIAN
               </h1>
               <p className="text-xs sm:text-sm text-gray-500 truncate">
-                Super Admin • {user?.email}
+                Super Admin
               </p>
             </div>
             <button
@@ -222,6 +236,10 @@ const SuperAdminInterface = () => {
                   <div className="flex gap-3 sm:gap-3 w-full sm:w-auto">
                     <a
                       href={`/${club.id}/admin`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href = `/${club.id}/admin`;
+                      }}
                       className="flex-1 sm:flex-none text-center px-4 sm:px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-medium transition-all shadow-lg shadow-blue-500/20 whitespace-nowrap min-h-[44px] flex items-center justify-center"
                     >
                       Admin Club

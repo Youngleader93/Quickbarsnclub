@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================
+    // FONCTIONS HELPER
+    // ============================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserData().role == 'super_admin';
+    }
+
+    function isClubAdmin() {
+      return isAuthenticated() && getUserData().role == 'club_admin';
+    }
+
+    function hasAccessToEtablissement(etablissementId) {
+      return isSuperAdmin() ||
+             (isClubAdmin() && etablissementId in getUserData().etablissements);
+    }
+
+    // ============================================
+    // COLLECTION: users
+    // ============================================
+    match /users/{userId} {
+      // Lecture: Utilisateur peut lire son propre doc OU Super Admin peut tout lire
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+
+      // Création/Modification: Seulement Super Admin
+      allow create, update: if isSuperAdmin();
+
+      // Suppression: Interdit (conservation des données)
+      allow delete: if false;
+    }
+
+    // ============================================
+    // COLLECTION: etablissements
+    // ============================================
+    match /etablissements/{etablissementId} {
+      // Lecture: Public (clients doivent voir les infos de l'établissement)
+      allow read: if true;
+
+      // Création: Seulement Super Admin
+      allow create: if isSuperAdmin();
+
+      // Modification: Super Admin OU Club Admin avec accès
+      allow update: if hasAccessToEtablissement(etablissementId);
+
+      // Suppression: Seulement Super Admin
+      allow delete: if isSuperAdmin();
+
+      // ========================================
+      // SOUS-COLLECTION: menu
+      // ========================================
+      match /menu/{itemId} {
+        // Lecture: Public (clients doivent voir le menu)
+        allow read: if true;
+
+        // Écriture: Seulement admins avec accès à cet établissement
+        allow create, update, delete: if hasAccessToEtablissement(etablissementId);
+      }
+
+      // ========================================
+      // SOUS-COLLECTION: commandes
+      // ========================================
+      match /commandes/{commandeId} {
+        // Création: Public (clients créent des commandes)
+        allow create: if true;
+
+        // Lecture: Public (clients voient leurs commandes + staff voit toutes)
+        allow read: if true;
+
+        // Modification: Seulement admins avec accès (pour changer statut, etc.)
+        allow update: if hasAccessToEtablissement(etablissementId);
+
+        // Suppression: Seulement Super Admin
+        allow delete: if isSuperAdmin();
+      }
+    }
+
+    // ============================================
+    // COLLECTION: club_requests
+    // ============================================
+    match /club_requests/{requestId} {
+      // Création: Public (formulaire d'inscription ouvert)
+      allow create: if true;
+
+      // Lecture/Modification/Suppression: Seulement Super Admin
+      allow read, update, delete: if isSuperAdmin();
+    }
+
+    // ============================================
+    // BLOCAGE PAR DÉFAUT
+    // ============================================
+    // Toute autre collection non mentionnée est bloquée
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
