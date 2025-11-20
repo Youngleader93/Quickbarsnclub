@@ -63,7 +63,7 @@ export const RoleProvider = ({ children }) => {
         if (role === 'super_admin') {
           setClubAccess([]);
         } else if (role === 'club_admin') {
-          setClubAccess(userData.clubAccess || []);
+          setClubAccess(userData.etablissements || userData.clubAccess || []);
         } else {
           setClubAccess([]);
         }

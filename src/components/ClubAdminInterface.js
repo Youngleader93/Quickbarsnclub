@@ -7,7 +7,7 @@ import Settings from './Settings';
 
 const ClubAdminInterface = ({ clubId }) => {
   const { user, logout } = useAuth();
-  const { canAccessClub, isSuperAdmin, userRole, loading } = useRole();
+  const { canAccessClub, isSuperAdmin, userRole, displayName, loading } = useRole();
   const [activeTab, setActiveTab] = useState('menu');
 
   const handleLogout = async () => {
@@ -85,11 +85,11 @@ const ClubAdminInterface = ({ clubId }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight" style={{ color: '#00FF41' }}>
-                Admin - {clubId}
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight text-white">
+                {displayName || user?.email || 'Admin'}
               </h1>
               <p className="text-sm text-gray-500">
-                {user?.email} {isSuperAdmin() && <span className="text-yellow-400">• Super Admin</span>}
+                {clubId} {isSuperAdmin() && <span className="text-yellow-400">• Super Admin</span>}
               </p>
             </div>
             <div className="flex gap-3 sm:gap-3 flex-wrap">
