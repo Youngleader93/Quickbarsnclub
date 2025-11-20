@@ -112,11 +112,11 @@ const SuperAdminInterface = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
             <div className="min-w-0 flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight truncate" style={{ color: '#00FF41' }}>
-                Super Admin Dashboard
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight truncate text-white">
+                NGALEU CHRISTIAN
               </h1>
               <p className="text-xs sm:text-sm text-gray-500 truncate">
-                {displayName} • {user?.email}
+                Super Admin • {user?.email}
               </p>
             </div>
             <button

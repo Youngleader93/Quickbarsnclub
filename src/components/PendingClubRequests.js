@@ -93,12 +93,17 @@ const PendingClubRequests = () => {
         generatedPassword: generatedPassword
       });
 
-      alert(`✅ Établissement "${request.nom}" approuvé avec succès !\n\nEmail: ${request.email}\nMot de passe: ${generatedPassword}\n\n⚠️ Copiez ce mot de passe et envoyez-le au gérant !`);
+      // Afficher le mot de passe AVANT de recharger
+      alert(`✅ Établissement "${request.nom}" approuvé avec succès !\n\nEmail: ${request.email}\nMot de passe: ${generatedPassword}\n\n⚠️ COPIEZ CE MOT DE PASSE MAINTENANT !\n\nLa page va se recharger dans 3 secondes...`);
+
+      // Recharger la page après un délai pour que l'utilisateur puisse lire
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
 
     } catch (error) {
       console.error('Erreur approbation:', error);
       alert(`❌ Erreur lors de l'approbation: ${error.message}`);
-    } finally {
       setProcessing(null);
     }
   };
