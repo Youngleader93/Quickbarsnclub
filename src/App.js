@@ -771,31 +771,46 @@ const ClientInterface = ({ etablissementId }) => {
         <style>{`
           @keyframes pulseGlow {
             0%, 100% {
-              opacity: 0.5;
+              opacity: 0.7;
               transform: scale(1);
+              box-shadow: 0 0 40px rgba(0, 255, 65, 0.5), 0 0 80px rgba(0, 255, 65, 0.3);
             }
             50% {
               opacity: 1;
-              transform: scale(1.05);
+              transform: scale(1.2);
+              box-shadow: 0 0 60px rgba(0, 255, 65, 0.8), 0 0 120px rgba(0, 255, 65, 0.6), 0 0 160px rgba(0, 255, 65, 0.4);
             }
           }
           .pulse-animation {
-            animation: pulseGlow 2s ease-in-out infinite;
+            animation: pulseGlow 1s ease-in-out infinite;
+          }
+          @keyframes textFlash {
+            0%, 100% {
+              opacity: 0.8;
+              text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            }
+            50% {
+              opacity: 1;
+              text-shadow: 0 0 40px rgba(0, 255, 65, 0.8), 0 0 60px rgba(0, 255, 65, 0.5);
+            }
+          }
+          .text-flash {
+            animation: textFlash 1s ease-in-out infinite;
           }
         `}</style>
 
         <div className="max-w-md w-full text-center">
           {isReady ? (
             <>
-              <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center pulse-animation shadow-2xl shadow-green-500/50">
+              <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center pulse-animation">
                 <Check size={64} className="text-black" />
               </div>
-              <h1 className="text-4xl font-light mb-6 tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
+              <h1 className="text-4xl font-light mb-6 tracking-wide uppercase text-flash" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
                 {t('orderReady')}
               </h1>
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8 shadow-xl border border-gray-800/50">
                 <p className="text-gray-400 text-sm mb-2 font-normal">{t('orderNumber')}</p>
-                <p className="text-6xl font-light mb-6" style={{ color: '#00FF41', fontWeight: '300', textShadow: '0 0 20px rgba(0, 255, 65, 0.3)' }}>#{currentOrder.number}</p>
+                <p className="text-6xl font-light mb-6 text-flash" style={{ color: '#00FF41', fontWeight: '300' }}>#{currentOrder.number}</p>
                 <div className="h-px bg-gray-700/50 mb-6"></div>
                 <p className="text-gray-400 text-sm mb-2 font-normal">{t('totalAmount')}</p>
                 <p className="text-3xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${currentOrder.total.toFixed(2)}</p>
