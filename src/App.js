@@ -576,7 +576,10 @@ const ClientInterface = ({ etablissementId }) => {
         return { ...item, quantity: qty };
       });
 
-    const newOrderNumber = Date.now().toString().slice(-6);
+    // Génère un numéro de commande : 1 lettre (A-Z) + 3 chiffres (001-999)
+    const letter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
+    const digits = Math.floor(Math.random() * 999) + 1; // 1-999
+    const newOrderNumber = `${letter}${digits.toString().padStart(3, '0')}`; // Ex: A123, B456
     const subtotal = getTotalPrice();
     const total = subtotal + tipAmount;
 
