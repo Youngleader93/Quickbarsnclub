@@ -1109,6 +1109,17 @@ const TabletInterface = ({ etablissementId }) => {
     return () => unsubscribe();
   }, [etablissementId]);
 
+  const markAsInPreparation = async (orderId) => {
+    try {
+      await updateDoc(
+        doc(db, 'etablissements', etablissementId, 'commandes', orderId),
+        { status: 'in_preparation' }
+      );
+    } catch (error) {
+      console.error('Erreur marquage en préparation:', error);
+    }
+  };
+
   const markAsReady = async (orderId) => {
     try {
       await updateDoc(
@@ -1159,6 +1170,7 @@ const TabletInterface = ({ etablissementId }) => {
   };
 
   const pendingOrders = orders.filter(o => o.status === 'pending');
+  const inPreparationOrders = orders.filter(o => o.status === 'in_preparation');
   const readyOrders = orders.filter(o => o.status === 'ready');
 
   return (
@@ -1217,7 +1229,7 @@ const TabletInterface = ({ etablissementId }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           <div>
             <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-yellow-400 flex items-center gap-2 sm:gap-3">
               En attente
@@ -1235,6 +1247,60 @@ const TabletInterface = ({ etablissementId }) => {
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="text-2xl font-bold text-yellow-400">#{order.number}</h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {new Date(order.timestamp).toLocaleTimeString('fr-FR')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 mb-4">
+                      {order.items.map((item, i) => (
+                        <div key={i} className="flex justify-between text-sm text-gray-300">
+                          <span>{item.quantity}x {item.name}</span>
+                          <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="pt-4 mb-4">
+                      <div className="flex justify-between items-baseline">
+                        <span className="text-white font-semibold">Total</span>
+                        <span className="text-2xl font-bold" style={{ color: '#00FF41' }}>${order.total.toFixed(2)}</span>
+                      </div>
+                      {order.tip > 0 && (
+                        <p className="text-xs text-gray-500 mt-1 text-right">
+                          dont ${order.tip.toFixed(2)} de pourboire
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => markAsInPreparation(order.id)}
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white py-4 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30"
+                    >
+                      <Check size={20} />
+                      Prendre en charge
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-blue-400 flex items-center gap-2 sm:gap-3">
+              En préparation
+              <span className="text-xs sm:text-sm font-normal bg-blue-500/20 px-2 py-0.5 rounded text-blue-400">({inPreparationOrders.length})</span>
+            </h2>
+            {inPreparationOrders.length === 0 ? (
+              <div className="text-center py-8 sm:py-12 bg-gray-900/20 rounded-xl">
+                <p className="text-gray-400 font-medium text-sm sm:text-base">Aucune commande en préparation</p>
+                <p className="text-gray-600 text-xs mt-1">Les commandes prises en charge apparaîtront ici</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {inPreparationOrders.map(order => (
+                  <div key={order.id} className="bg-blue-500/5 backdrop-blur-sm rounded-2xl p-5 shadow-xl hover:bg-blue-500/10 transition-all border border-blue-500/20">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="text-2xl font-bold text-blue-400">#{order.number}</h3>
                         <p className="text-sm text-gray-500 mt-1">
                           {new Date(order.timestamp).toLocaleTimeString('fr-FR')}
                         </p>
