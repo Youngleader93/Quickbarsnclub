@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Save, AlertCircle, Check, Clock, Wifi, MapPin, Phone, Mail } from 'lucide-react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
+import { Save, AlertCircle, Check, Clock, Wifi, MapPin, Phone, Mail, UserPlus, Trash2, Users } from 'lucide-react';
 
 const Settings = ({ etablissementId }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Gestion des serveurs
+  const [servers, setServers] = useState([]);
+  const [loadingServers, setLoadingServers] = useState(false);
+  const [creatingServer, setCreatingServer] = useState(false);
+  const [newServer, setNewServer] = useState({
+    email: '',
+    password: '',
+    displayName: ''
+  });
 
   const [settings, setSettings] = useState({
     nom: '',
@@ -42,6 +54,7 @@ const Settings = ({ etablissementId }) => {
 
   useEffect(() => {
     loadSettings();
+    loadServers();
   }, [etablissementId]);
 
   const loadSettings = async () => {
@@ -65,6 +78,87 @@ const Settings = ({ etablissementId }) => {
       setError('Erreur lors du chargement des paramètres');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadServers = async () => {
+    try {
+      setLoadingServers(true);
+      const q = query(
+        collection(db, 'users'),
+        where('role', '==', 'serveur'),
+        where('etablissementId', '==', etablissementId)
+      );
+      const snapshot = await getDocs(q);
+      const serversList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setServers(serversList);
+    } catch (error) {
+      console.error('Erreur chargement serveurs:', error);
+    } finally {
+      setLoadingServers(false);
+    }
+  };
+
+  const createServer = async () => {
+    if (!newServer.email || !newServer.password || !newServer.displayName) {
+      showMessage('error', 'Veuillez remplir tous les champs');
+      return;
+    }
+
+    if (newServer.password.length < 6) {
+      showMessage('error', 'Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+
+    setCreatingServer(true);
+
+    try {
+      // Créer l'utilisateur dans Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        newServer.email,
+        newServer.password
+      );
+
+      // Créer le document dans Firestore avec l'UID comme ID de document
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: newServer.email,
+        displayName: newServer.displayName,
+        role: 'serveur',
+        etablissementId: etablissementId,
+        createdAt: new Date().toISOString()
+      });
+
+      showMessage('success', `Serveur ${newServer.displayName} créé avec succès`);
+      setNewServer({ email: '', password: '', displayName: '' });
+      loadServers();
+    } catch (error) {
+      console.error('Erreur création serveur:', error);
+      if (error.code === 'auth/email-already-in-use') {
+        showMessage('error', 'Cet email est déjà utilisé');
+      } else {
+        showMessage('error', `Erreur: ${error.message}`);
+      }
+    } finally {
+      setCreatingServer(false);
+    }
+  };
+
+  const deleteServer = async (serverId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce serveur ?')) {
+      return;
+    }
+
+    try {
+      await deleteDoc(doc(db, 'users', serverId));
+      showMessage('success', 'Serveur supprimé');
+      loadServers();
+    } catch (error) {
+      console.error('Erreur suppression serveur:', error);
+      showMessage('error', 'Erreur lors de la suppression');
     }
   };
 
@@ -318,6 +412,100 @@ const Settings = ({ etablissementId }) => {
         <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-blue-500/10 rounded-xl">
           <p className="text-xs sm:text-sm text-blue-400">
             Ces informations seront affichées aux clients sur la page d'accueil
+          </p>
+        </div>
+      </div>
+
+      {/* Gestion des serveurs */}
+      <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
+          <Users size={18} className="sm:w-5 sm:h-5" style={{ color: '#00FF41' }} />
+          Gestion des serveurs
+        </h3>
+
+        {/* Formulaire de création */}
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-400 mb-3">Créer un nouveau serveur</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <input
+                type="text"
+                placeholder="Nom d'affichage"
+                value={newServer.displayName}
+                onChange={(e) => setNewServer({ ...newServer, displayName: e.target.value })}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
+              />
+            </div>
+            <div>
+              <input
+                type="email"
+                placeholder="Email"
+                value={newServer.email}
+                onChange={(e) => setNewServer({ ...newServer, email: e.target.value })}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                placeholder="Mot de passe (min 6 car.)"
+                value={newServer.password}
+                onChange={(e) => setNewServer({ ...newServer, password: e.target.value })}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
+              />
+            </div>
+          </div>
+          <button
+            onClick={createServer}
+            disabled={creatingServer}
+            className="mt-3 w-full sm:w-auto px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+          >
+            <UserPlus size={16} className="sm:w-[18px] sm:h-[18px]" />
+            {creatingServer ? 'Création...' : 'Créer le serveur'}
+          </button>
+        </div>
+
+        {/* Liste des serveurs */}
+        <div>
+          <h4 className="text-sm font-medium text-gray-400 mb-3">
+            Serveurs existants ({servers.length})
+          </h4>
+          {loadingServers ? (
+            <div className="text-center py-4">
+              <p className="text-gray-500 text-sm">Chargement...</p>
+            </div>
+          ) : servers.length === 0 ? (
+            <div className="text-center py-8 bg-gray-800/30 rounded-xl">
+              <Users size={32} className="mx-auto text-gray-600 mb-2" />
+              <p className="text-gray-500 text-sm">Aucun serveur créé</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {servers.map((server) => (
+                <div
+                  key={server.id}
+                  className="flex items-center justify-between p-3 bg-gray-800/30 rounded-xl hover:bg-gray-800/50 transition-all"
+                >
+                  <div className="flex-1">
+                    <p className="text-white font-medium text-sm sm:text-base">{server.displayName}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm">{server.email}</p>
+                  </div>
+                  <button
+                    onClick={() => deleteServer(server.id)}
+                    className="p-2 hover:bg-red-900/20 rounded-lg transition-all"
+                    title="Supprimer"
+                  >
+                    <Trash2 size={16} className="sm:w-[18px] sm:h-[18px] text-red-400" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 p-3 bg-yellow-500/10 rounded-xl">
+          <p className="text-xs sm:text-sm text-yellow-400">
+            ⚠️ Les serveurs ont uniquement accès à la tablette et ne peuvent pas modifier les paramètres
           </p>
         </div>
       </div>
