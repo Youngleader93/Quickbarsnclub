@@ -65,6 +65,10 @@ export const RoleProvider = ({ children }) => {
           setClubAccess([]);
         } else if (role === 'club_admin') {
           setClubAccess(userData.etablissements || userData.clubAccess || []);
+        } else if (role === 'serveur') {
+          // Serveur a accès à un seul établissement (pour la tablette)
+          const etablissementId = userData.etablissementId;
+          setClubAccess(etablissementId ? [etablissementId] : []);
         } else {
           setClubAccess([]);
         }
@@ -119,8 +123,26 @@ export const RoleProvider = ({ children }) => {
     return clubAccess.includes(clubId);
   };
 
+  const isServeur = (clubId = null) => {
+    if (userRole !== 'serveur') return false;
+    if (!clubId) return true; // Vérifie juste qu'il est serveur
+    return clubAccess.includes(clubId);
+  };
+
   const canAccessClub = (clubId) => {
     // Si pas encore initialisé, ne pas bloquer l'accès (le loader global s'en charge)
+    if (!isInitialized) return true;
+    return isSuperAdmin() || isClubAdmin(clubId);
+  };
+
+  const canAccessTablet = (clubId) => {
+    // Serveurs, admins et super-admins peuvent accéder à la tablette
+    if (!isInitialized) return true;
+    return isSuperAdmin() || isClubAdmin(clubId) || isServeur(clubId);
+  };
+
+  const canAccessAdmin = (clubId) => {
+    // Seulement super-admin et club-admin (PAS les serveurs)
     if (!isInitialized) return true;
     return isSuperAdmin() || isClubAdmin(clubId);
   };
@@ -134,7 +156,10 @@ export const RoleProvider = ({ children }) => {
     error,
     isSuperAdmin,
     isClubAdmin,
+    isServeur,
     canAccessClub,
+    canAccessTablet,
+    canAccessAdmin,
     reloadRole
   };
 

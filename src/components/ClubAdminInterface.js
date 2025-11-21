@@ -8,7 +8,7 @@ import Settings from './Settings';
 
 const ClubAdminInterface = ({ clubId }) => {
   const { user, logout } = useAuth();
-  const { canAccessClub, isSuperAdmin, userRole, displayName, isInitialized, clubAccess } = useRole();
+  const { canAccessAdmin, isSuperAdmin, isServeur, userRole, displayName, isInitialized, clubAccess } = useRole();
   // Initialiser avec null, puis définir selon le rôle dans useEffect
   const [activeTab, setActiveTab] = useState(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -57,7 +57,43 @@ const ClubAdminInterface = ({ clubId }) => {
     );
   }
 
-  if (!canAccessClub(clubId)) {
+  // Redirection spéciale pour les serveurs
+  if (isServeur(clubId)) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
+        <div className="max-w-md w-full text-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-yellow-500"></div>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-yellow-500 tracking-tight">
+            Accès Serveur
+          </h1>
+          <p className="text-base sm:text-lg text-gray-400 mb-3 sm:mb-4">
+            Vous êtes connecté en tant que <strong className="text-white">serveur</strong>.
+          </p>
+          <p className="text-sm text-gray-500 mb-6 sm:mb-8">
+            Les serveurs ont uniquement accès à la tablette.
+          </p>
+          <div className="flex flex-col gap-3">
+            <a
+              href={`/${clubId}/tablette`}
+              className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
+            >
+              Accéder à la Tablette
+            </a>
+            <button
+              onClick={handleLogout}
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold text-base sm:text-lg transition-all"
+            >
+              Se déconnecter
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!canAccessAdmin(clubId)) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
         <div className="max-w-md w-full text-center">
