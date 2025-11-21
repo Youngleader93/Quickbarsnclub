@@ -16,14 +16,14 @@ const OrderHistory = ({ etablissementId }) => {
     try {
       setLoading(true);
 
-      // Date d'il y a 6 mois pour avoir plus d'historique
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      // Date d'il y a 3 mois
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
       const ordersRef = collection(db, 'etablissements', etablissementId, 'commandes');
       const q = query(
         ordersRef,
-        where('timestamp', '>=', sixMonthsAgo.toISOString()),
+        where('timestamp', '>=', threeMonthsAgo.toISOString()),
         orderBy('timestamp', 'desc')
       );
 
@@ -41,10 +41,10 @@ const OrderHistory = ({ etablissementId }) => {
     }
   };
 
-  // Générer les 6 derniers mois
+  // Générer les 3 derniers mois
   const getLastMonths = () => {
     const months = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 3; i++) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
