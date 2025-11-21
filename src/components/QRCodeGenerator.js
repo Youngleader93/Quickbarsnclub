@@ -49,7 +49,7 @@ const QRCodeGenerator = ({ etablissementId }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
         <div>
-          <h2 className="text-lg sm:text-2xl font-bold font-mono" style={{ color: '#00FF41' }}>
+          <h2 className="text-lg sm:text-2xl font-bold font-mono text-white">
             GÉNÉRATEUR DE QR CODES
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">

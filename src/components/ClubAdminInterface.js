@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRole } from '../contexts/RoleContext';
 import MenuManager from './MenuManager';
 import QRCodeGenerator from './QRCodeGenerator';
+import OrderHistory from './OrderHistory';
 import Settings from './Settings';
 
 const ClubAdminInterface = ({ clubId }) => {
@@ -161,6 +162,16 @@ const ClubAdminInterface = ({ clubId }) => {
               QR Codes
             </button>
             <button
+              onClick={() => setActiveTab('historique')}
+              className={`px-5 sm:px-5 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap min-h-[44px] ${
+                activeTab === 'historique'
+                  ? 'bg-gradient-to-r from-green-600 to-green-500 text-black shadow-lg shadow-green-500/30'
+                  : 'hover:bg-gray-800/50 text-gray-300 hover:text-white font-medium'
+              }`}
+            >
+              Historique
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`px-5 sm:px-5 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap min-h-[44px] ${
                 activeTab === 'settings'
@@ -194,6 +205,7 @@ const ClubAdminInterface = ({ clubId }) => {
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
         {activeTab === 'menu' && <MenuManager etablissementId={clubId} />}
         {activeTab === 'qrcodes' && <QRCodeGenerator etablissementId={clubId} />}
+        {activeTab === 'historique' && <OrderHistory etablissementId={clubId} />}
         {activeTab === 'settings' && <Settings etablissementId={clubId} />}
       </div>
     </div>
