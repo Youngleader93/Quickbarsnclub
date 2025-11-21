@@ -6,7 +6,8 @@ const QRCodeGenerator = ({ etablissementId }) => {
   const [tables, setTables] = useState([1, 2, 3, 4, 5]);
   const [newTableNumber, setNewTableNumber] = useState('');
 
-  const baseUrl = window.location.origin;
+  // Utilise l'URL de production ou l'URL locale selon l'environnement
+  const baseUrl = process.env.REACT_APP_PRODUCTION_URL || window.location.origin;
 
   // Ajouter une table
   const addTable = () => {
