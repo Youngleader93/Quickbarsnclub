@@ -1047,6 +1047,7 @@ const ClientInterface = ({ etablissementId }) => {
 
 // TabletInterface Component - Design Moderne
 const TabletInterface = ({ etablissementId }) => {
+  const { userRole, displayName } = useRole();
   const [orders, setOrders] = useState([]);
   const [etablissementName, setEtablissementName] = useState('');
   // ============================================
@@ -1176,14 +1177,28 @@ const TabletInterface = ({ etablissementId }) => {
   return (
     <div className="min-h-screen bg-black p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Club name in top-right */}
-        {etablissementName && (
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        {/* Club name and role indicator in top-right */}
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex flex-col items-end gap-2">
+          {etablissementName && (
             <h2 className="text-base sm:text-xl font-bold text-white">
               {etablissementName}
             </h2>
-          </div>
-        )}
+          )}
+          {/* Role indicator */}
+          {userRole === 'serveur' ? (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+              <span className="text-xs sm:text-sm font-medium text-blue-400">Accès serveur</span>
+              {displayName && <span className="text-xs text-blue-300">({displayName})</span>}
+            </div>
+          ) : userRole === 'club_admin' || userRole === 'super_admin' ? (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span className="text-xs sm:text-sm font-medium text-green-400">Accès admin</span>
+              {displayName && <span className="text-xs text-green-300">({displayName})</span>}
+            </div>
+          ) : null}
+        </div>
 
         <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
