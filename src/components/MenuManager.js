@@ -314,7 +314,7 @@ Tiramisu,6.00,dessert,Tiramisu maison`;
     <div className="space-y-4 sm:space-y-6">
       {/* Header avec boutons */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-        <h2 className="text-lg sm:text-2xl font-bold font-mono" style={{ color: '#00FF41' }}>
+        <h2 className="text-lg sm:text-2xl font-bold font-mono text-white">
           GESTION DU MENU ({menuItems.length} items)
         </h2>
         <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
