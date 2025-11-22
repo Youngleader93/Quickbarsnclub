@@ -164,82 +164,68 @@ const OrderHistory = ({ etablissementId }) => {
         })}
       </div>
 
-      {/* Liste des commandes */}
+      {/* Liste des commandes - Format compact */}
       {filteredOrders.length === 0 ? (
         <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-8 text-center">
           <Package size={48} className="mx-auto text-gray-600 mb-4" />
           <p className="text-gray-400">Aucune commande trouvée</p>
         </div>
       ) : (
-        <div className="space-y-3 sm:space-y-4">
-          {filteredOrders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl hover:bg-gray-900/40 transition-all"
-            >
-              {/* Header */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl sm:text-3xl font-bold text-white">
+        <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl overflow-hidden">
+          {/* Header du tableau */}
+          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-800/50 text-xs font-semibold text-gray-400 border-b border-gray-700/50">
+            <div className="col-span-2">Numéro</div>
+            <div className="col-span-2">Date/Heure</div>
+            <div className="col-span-5">Articles</div>
+            <div className="col-span-2 text-right">Total</div>
+            <div className="col-span-1 text-center">✓</div>
+          </div>
+
+          {/* Lignes */}
+          <div className="divide-y divide-gray-800/30">
+            {filteredOrders.map((order) => {
+              // Formater les articles sur une ligne
+              const itemsText = order.items.map(item => `${item.quantity}x ${item.name}`).join(', ');
+              const date = new Date(order.deliveredAt || order.timestamp);
+              const dateStr = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+              const timeStr = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+              return (
+                <div
+                  key={order.id}
+                  className="grid grid-cols-12 gap-2 px-4 py-3 hover:bg-gray-800/30 transition-all text-sm"
+                >
+                  {/* Numéro */}
+                  <div className="col-span-2 font-bold text-white">
                     #{order.number}
                   </div>
-                  {getStatusBadge(order.status)}
-                </div>
-                <div className="flex flex-col sm:items-end gap-1">
-                  <div className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm">
-                    <Calendar size={14} />
-                    <span>{formatDate(order.deliveredAt || order.timestamp)}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm">
-                    <Clock size={14} />
-                    <span>{formatTime(order.deliveredAt || order.timestamp)}</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Items */}
-              <div className="space-y-2 mb-4">
-                {order.items.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex justify-between items-center py-2 border-b border-gray-800/50 last:border-0"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-gray-500 font-medium">x{item.quantity}</span>
-                      <span className="text-white text-sm sm:text-base">{item.name}</span>
-                    </div>
-                    <span className="text-gray-400 text-sm sm:text-base">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </span>
+                  {/* Date/Heure */}
+                  <div className="col-span-2 text-gray-400 text-xs">
+                    {dateStr} {timeStr}
                   </div>
-                ))}
-              </div>
 
-              {/* Total */}
-              <div className="bg-gray-800/30 rounded-xl p-3 sm:p-4 space-y-2">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Sous-total</span>
-                  <span className="text-white">${order.subtotal?.toFixed(2) || '0.00'}</span>
-                </div>
-                {order.tip > 0 && (
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-400">Pourboire</span>
-                    <span className="text-green-400">+${order.tip.toFixed(2)}</span>
+                  {/* Articles */}
+                  <div className="col-span-5 text-gray-300 truncate text-xs" title={itemsText}>
+                    {itemsText}
                   </div>
-                )}
-                <div className="h-px bg-gray-700/50"></div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-semibold flex items-center gap-2">
-                    <DollarSign size={16} />
-                    TOTAL
-                  </span>
-                  <span className="text-xl font-bold" style={{ color: '#00FF41' }}>
+
+                  {/* Total */}
+                  <div className="col-span-2 text-right font-semibold" style={{ color: '#00FF41' }}>
                     ${order.total.toFixed(2)}
-                  </span>
+                    {order.tip > 0 && (
+                      <span className="text-xs text-gray-500 ml-1">(+${order.tip.toFixed(2)})</span>
+                    )}
+                  </div>
+
+                  {/* Status */}
+                  <div className="col-span-1 text-center">
+                    <span className="text-green-400 text-lg">✓</span>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
