@@ -160,9 +160,12 @@ const UsersManager = () => {
   };
 
   if (!isSuperAdmin()) {
+    window.location.href = '/admin/login';
     return (
-      <div className="text-center py-8">
-        <div className="text-red-500 text-xl">Accès réservé aux Super Admins</div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Chargement...
+        </div>
       </div>
     );
   }

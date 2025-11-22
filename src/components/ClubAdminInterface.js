@@ -7,23 +7,34 @@ import OrderHistory from './OrderHistory';
 import Settings from './Settings';
 
 const ClubAdminInterface = ({ clubId }) => {
-  const { user, logout } = useAuth();
+  // ⚠️ VÉRIFICATION CRITIQUE AVANT TOUT - Empêche le flash pendant la déconnexion
+  if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
+    return null; // Ne rien rendre du tout
+  }
+
+  const { user, logout, isLoggingOut } = useAuth();
   const { canAccessAdmin, isSuperAdmin, isServeur, userRole, displayName, isInitialized, clubAccess } = useRole();
   // Initialiser avec null, puis définir selon le rôle dans useEffect
   const [activeTab, setActiveTab] = useState(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     if (window.confirm('Voulez-vous vous déconnecter ?')) {
-      setIsLoggingOut(true);
-      const result = await logout();
-      if (result.success) {
-        // Rediriger vers login sans returnUrl
-        window.location.href = '/admin/login';
-      } else {
-        setIsLoggingOut(false);
-        alert('Erreur lors de la déconnexion');
+      // Marquer la déconnexion dans sessionStorage
+      sessionStorage.setItem('isLoggingOut', 'true');
+
+      // MASQUER TOUT AVEC CSS !important - Impossible de contourner
+      const style = document.createElement('style');
+      style.id = 'logout-hide';
+      style.textContent = '* { display: none !important; } body::after { content: "Déconnexion..."; display: block !important; color: #00FF41; font-family: monospace; font-size: 20px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); }';
+      document.head.appendChild(style);
+
+      // Déconnexion puis redirection immédiate
+      try {
+        await logout();
+      } catch (e) {
+        // Ignorer les erreurs, rediriger quand même
       }
+      window.location.replace('/admin/login');
     }
   };
 
@@ -35,18 +46,8 @@ const ClubAdminInterface = ({ clubId }) => {
     }
   }, [isInitialized, activeTab]);
 
-  // Si en train de se déconnecter, afficher loader
-  if (isLoggingOut) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
-          Déconnexion en cours...
-        </div>
-      </div>
-    );
-  }
-
   // Attendre que tout soit initialisé ET que l'onglet par défaut soit défini
+  // Note: isLoggingOut est géré globalement dans App.js
   if (!isInitialized || activeTab === null) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -57,86 +58,25 @@ const ClubAdminInterface = ({ clubId }) => {
     );
   }
 
-  // Redirection spéciale pour les serveurs
+  // Redirection spéciale pour les serveurs - rediriger directement vers la tablette
   if (isServeur(clubId)) {
+    window.location.href = `/${clubId}/tablette`;
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
-        <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-yellow-500"></div>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-yellow-500 tracking-tight">
-            Accès Serveur
-          </h1>
-          <p className="text-base sm:text-lg text-gray-400 mb-3 sm:mb-4">
-            Vous êtes connecté en tant que <strong className="text-white">serveur</strong>.
-          </p>
-          <p className="text-sm text-gray-500 mb-6 sm:mb-8">
-            Les serveurs ont uniquement accès à la tablette.
-          </p>
-          <div className="flex flex-col gap-3">
-            <a
-              href={`/${clubId}/tablette`}
-              className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
-            >
-              Accéder à la Tablette
-            </a>
-            <button
-              onClick={handleLogout}
-              className="px-6 sm:px-8 py-3 sm:py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold text-base sm:text-lg transition-all"
-            >
-              Se déconnecter
-            </button>
-          </div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Chargement...
         </div>
       </div>
     );
   }
 
   if (!canAccessAdmin(clubId)) {
+    // Redirection immédiate sans afficher "Accès Refusé"
+    window.location.href = '/admin/login';
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
-        <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 rounded-full bg-red-500/10 flex items-center justify-center">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-red-500"></div>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-red-500 tracking-tight">
-            Accès Refusé
-          </h1>
-          <p className="text-base sm:text-lg text-gray-400 mb-3 sm:mb-4">
-            Vous n'avez pas les permissions pour accéder à l'administration de <strong className="text-white">{clubId}</strong>.
-          </p>
-          <p className="text-xs sm:text-sm text-gray-500 mb-2 truncate">
-            Connecté en tant que : {user?.email}
-          </p>
-          <div className="text-xs text-left bg-gray-800/50 p-3 rounded-lg mb-6 sm:mb-8">
-            <p className="text-gray-400">DEBUG INFO:</p>
-            <p className="text-yellow-400">Role: {userRole || 'null'}</p>
-            <p className="text-yellow-400">Club demandé: {clubId}</p>
-            <p className="text-yellow-400">Clubs autorisés: {JSON.stringify(clubAccess)}</p>
-          </div>
-          <div className="flex flex-col gap-3">
-            {isSuperAdmin() && (
-              <a
-                href="/admin"
-                className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
-              >
-                Retour Dashboard
-              </a>
-            )}
-            <button
-              onClick={handleLogout}
-              className="px-6 sm:px-8 py-3 sm:py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-semibold text-base sm:text-lg transition-all"
-            >
-              Se déconnecter
-            </button>
-            <a
-              href={`/${clubId}`}
-              className="text-gray-500 hover:text-gray-300 text-xs sm:text-sm mt-2 sm:mt-4 transition-colors"
-            >
-              Retour au menu client
-            </a>
-          </div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Chargement...
         </div>
       </div>
     );

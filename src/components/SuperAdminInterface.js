@@ -83,37 +83,12 @@ const SuperAdminInterface = () => {
   }
 
   if (!isSuperAdmin()) {
+    // Redirection immédiate sans afficher "Accès Refusé"
+    window.location.href = '/admin/login';
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
-        <div className="max-w-md w-full text-center">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 sm:mb-8 rounded-full bg-red-500/10 flex items-center justify-center">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-red-500"></div>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-red-500 tracking-tight">
-            Accès Refusé
-          </h1>
-          <p className="text-sm sm:text-base text-gray-400 mb-2">
-            Vous devez être Super Admin pour accéder à cette page.
-          </p>
-          <p className="text-xs sm:text-sm text-gray-500 mb-1 truncate">Rôle actuel : {userRole || 'aucun'}</p>
-          <p className="text-xs text-gray-600 mb-6 sm:mb-8 truncate">UID : {user?.uid}</p>
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={reloadRole}
-              className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20 text-sm sm:text-base"
-            >
-              Recharger les permissions
-            </button>
-            <button
-              onClick={async () => {
-                await logout();
-                window.location.href = '/admin/login';
-              }}
-              className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30 text-sm sm:text-base"
-            >
-              Se déconnecter
-            </button>
-          </div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Chargement...
         </div>
       </div>
     );

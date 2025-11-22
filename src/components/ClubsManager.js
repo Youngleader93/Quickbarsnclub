@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, setDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, setDoc, updateDoc, deleteDoc, doc, query, orderBy, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useRole } from '../contexts/RoleContext';
 
 const ClubsManager = () => {
   const { isSuperAdmin } = useRole();
   const [clubs, setClubs] = useState([]);
+  const [clubAdmins, setClubAdmins] = useState({});
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingClub, setEditingClub] = useState(null);
@@ -18,11 +19,12 @@ const ClubsManager = () => {
   });
 
   useEffect(() => {
-    loadClubs();
+    loadData();
   }, []);
 
-  const loadClubs = async () => {
+  const loadData = async () => {
     try {
+      // Charger les clubs
       const q = query(collection(db, 'etablissements'), orderBy('nom'));
       const snapshot = await getDocs(q);
       const clubsData = snapshot.docs.map(doc => ({
@@ -30,12 +32,52 @@ const ClubsManager = () => {
         ...doc.data()
       }));
       setClubs(clubsData);
+
+      // Charger les admins de clubs
+      await loadClubAdmins();
     } catch (error) {
-      console.error('Erreur chargement clubs:', error);
-      alert('Erreur lors du chargement des clubs');
+      console.error('Erreur chargement données:', error);
+      alert('Erreur lors du chargement des données');
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadClubAdmins = async () => {
+    try {
+      // Charger tous les club_admin
+      const q = query(
+        collection(db, 'users'),
+        where('role', '==', 'club_admin')
+      );
+      const snapshot = await getDocs(q);
+
+      // Organiser les admins par club
+      const adminsByClub = {};
+      snapshot.docs.forEach(doc => {
+        const userData = doc.data();
+        const clubAccess = userData.clubAccess || [];
+
+        // Pour chaque club auquel cet admin a accès
+        clubAccess.forEach(clubId => {
+          if (!adminsByClub[clubId]) {
+            adminsByClub[clubId] = [];
+          }
+          adminsByClub[clubId].push({
+            email: userData.email,
+            displayName: userData.displayName || userData.email
+          });
+        });
+      });
+
+      setClubAdmins(adminsByClub);
+    } catch (error) {
+      console.error('Erreur chargement admins:', error);
+    }
+  };
+
+  const loadClubs = async () => {
+    await loadData();
   };
 
   const handleSubmit = async (e) => {
@@ -135,9 +177,12 @@ const ClubsManager = () => {
   };
 
   if (!isSuperAdmin()) {
+    window.location.href = '/admin/login';
     return (
-      <div className="text-center py-8">
-        <div className="text-red-500 text-xl">Accès réservé aux Super Admins</div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Chargement...
+        </div>
       </div>
     );
   }
@@ -289,6 +334,31 @@ const ClubsManager = () => {
                     {club.wifiSSID && (
                       <div className="text-xs text-gray-500">
                         WiFi: {club.wifiSSID}
+                      </div>
+                    )}
+                    {clubAdmins[club.id] && clubAdmins[club.id].length > 0 && (
+                      <div className="mt-2 p-2 bg-blue-900/20 rounded border border-blue-500/30">
+                        <div className="text-xs font-semibold text-blue-400 mb-1">
+                          Admin(s) du club:
+                        </div>
+                        {clubAdmins[club.id].map((admin, idx) => (
+                          <div key={idx} className="text-xs text-gray-300">
+                            📧 {admin.email}
+                            {admin.displayName !== admin.email && (
+                              <span className="text-gray-500"> ({admin.displayName})</span>
+                            )}
+                          </div>
+                        ))}
+                        <div className="text-xs text-yellow-400 mt-1 italic">
+                          ⚠️ Les mots de passe ne sont pas affichés pour des raisons de sécurité
+                        </div>
+                      </div>
+                    )}
+                    {(!clubAdmins[club.id] || clubAdmins[club.id].length === 0) && (
+                      <div className="mt-2 p-2 bg-red-900/20 rounded border border-red-500/30">
+                        <div className="text-xs text-red-400">
+                          ⚠️ Aucun admin assigné à ce club
+                        </div>
                       </div>
                     )}
                   </div>

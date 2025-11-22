@@ -16,12 +16,15 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Écouter les changements d'état d'authentification
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
+      // Note: Ne pas réinitialiser isLoggingOut ici pour éviter le flash "Accès refusé"
+      // isLoggingOut sera réinitialisé uniquement par la redirection après logout
     });
 
     return unsubscribe;
@@ -69,11 +72,13 @@ export const AuthProvider = ({ children }) => {
   // Fonction de déconnexion
   const logout = async () => {
     try {
+      setIsLoggingOut(true);
       await signOut(auth);
       setUser(null);
       return { success: true };
     } catch (error) {
       setError('Erreur lors de la déconnexion');
+      setIsLoggingOut(false);
       return { success: false, error: error.message };
     }
   };
@@ -82,6 +87,7 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     error,
+    isLoggingOut,
     login,
     logout,
     setError

@@ -17,11 +17,33 @@ import ClubRegistrationForm from './components/ClubRegistrationForm';
 
 // Wrapper pour la logique principale avec auth
 const RestaurantOrderSystemWithAuth = () => {
-  const { user, loading } = useAuth();
+  // ⚠️ VÉRIFICATION CRITIQUE AVANT TOUT - Empêche tout flash pendant la déconnexion
+  if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Déconnexion en cours...
+        </div>
+      </div>
+    );
+  }
+
+  const { user, loading, isLoggingOut } = useAuth();
   const { userRole, clubAccess, isSuperAdmin, isInitialized } = useRole();
   const pathParts = window.location.pathname.split('/').filter(p => p);
   const firstPart = pathParts[0] || 'demo';
   const secondPart = pathParts[1] || '';
+
+  // LOADER PENDANT DÉCONNEXION (doublon de sécurité)
+  if (isLoggingOut) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Déconnexion en cours...
+        </div>
+      </div>
+    );
+  }
 
   // LOADER GLOBAL : Si user connecté mais rôles pas encore chargés, afficher loader
   if (user && !isInitialized) {
@@ -64,6 +86,9 @@ const RestaurantOrderSystemWithAuth = () => {
 
     // Route /admin/login
     if (secondPart === 'login') {
+      // Nettoyer le marqueur de déconnexion
+      sessionStorage.removeItem('isLoggingOut');
+
       // Récupérer le returnUrl depuis l'URL
       const urlParams = new URLSearchParams(window.location.search);
       const returnUrl = urlParams.get('returnUrl');
@@ -82,25 +107,13 @@ const RestaurantOrderSystemWithAuth = () => {
 
     // Routes /admin/clubs et /admin/users
     if (secondPart === 'clubs' || secondPart === 'users') {
-      // Si pas connecté, afficher écran connexion requise
+      // Si pas connecté, rediriger vers login
       if (!user) {
+        window.location.href = '/admin/login';
         return (
-          <div className="min-h-screen bg-black flex items-center justify-center p-4">
-            <div className="max-w-md text-center">
-              <div className="text-6xl mb-8" style={{ color: '#00FF41' }}>🔒</div>
-              <div className="text-3xl font-bold mb-4" style={{ color: '#00FF41' }}>
-                Connexion Requise
-              </div>
-              <div className="text-lg text-gray-400 mb-8">
-                Vous devez être connecté en tant que super-admin pour accéder à cette page.
-              </div>
-              <a
-                href="/admin/login"
-                className="inline-block px-8 py-4 rounded-lg font-bold text-lg hover:opacity-80"
-                style={{ backgroundColor: '#00FF41', color: '#000000' }}
-              >
-                SE CONNECTER
-              </a>
+          <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+              Chargement...
             </div>
           </div>
         );
@@ -131,25 +144,13 @@ const RestaurantOrderSystemWithAuth = () => {
     }
 
     // Route /admin (et autres sous-routes admin)
-    // Si pas connecté, afficher écran connexion requise
+    // Si pas connecté, rediriger vers login
     if (!user) {
+      window.location.href = '/admin/login';
       return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4">
-          <div className="max-w-md text-center">
-            <div className="text-6xl mb-8" style={{ color: '#00FF41' }}>🔒</div>
-            <div className="text-3xl font-bold mb-4" style={{ color: '#00FF41' }}>
-              Connexion Requise
-            </div>
-            <div className="text-lg text-gray-400 mb-8">
-              Vous devez être connecté pour accéder à l'administration.
-            </div>
-            <a
-              href="/admin/login"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg hover:opacity-80"
-              style={{ backgroundColor: '#00FF41', color: '#000000' }}
-            >
-              SE CONNECTER
-            </a>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+            Chargement...
           </div>
         </div>
       );
@@ -176,26 +177,12 @@ const RestaurantOrderSystemWithAuth = () => {
       return null;
     }
 
-    // Si pas de rôle approprié, afficher accès refusé
+    // Si pas de rôle approprié, rediriger vers login
+    window.location.href = '/admin/login';
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="max-w-md text-center">
-          <div className="text-6xl mb-8">🔒</div>
-          <div className="text-3xl font-bold mb-4 text-red-500">
-            Accès Refusé
-          </div>
-          <div className="text-lg text-gray-400 mb-4">
-            Vous n'avez pas les permissions pour accéder à cette page.
-          </div>
-          <div className="text-sm text-gray-500 mb-8">
-            Rôle actuel : {userRole || 'aucun'}
-          </div>
-          <a
-            href="/admin/login"
-            className="inline-block px-8 py-4 rounded-lg font-bold text-lg hover:opacity-80 bg-gradient-to-r from-green-600 to-green-500 text-black"
-          >
-            SE CONNECTER
-          </a>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Chargement...
         </div>
       </div>
     );
@@ -218,37 +205,14 @@ const RestaurantOrderSystemWithAuth = () => {
       );
     }
 
-    // Si pas connecté, afficher écran de connexion requis
+    // Si pas connecté, rediriger vers login avec returnUrl
     if (!user) {
       const returnUrl = `/${etablissementId}/admin`;
+      window.location.href = `/admin/login?returnUrl=${encodeURIComponent(returnUrl)}`;
       return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4">
-          <div className="max-w-md text-center">
-            <div className="text-6xl mb-8" style={{ color: '#00FF41' }}>🔒</div>
-            <div className="text-3xl font-bold mb-4" style={{ color: '#00FF41' }}>
-              Connexion Requise
-            </div>
-            <div className="text-lg text-gray-400 mb-4">
-              Vous devez être connecté pour accéder à l'interface admin de <strong className="text-white">{etablissementId}</strong>.
-            </div>
-            <div className="text-sm text-gray-500 mb-8">
-              Connectez-vous avec un compte ayant accès à cet établissement.
-            </div>
-            <a
-              href={`/admin/login?returnUrl=${encodeURIComponent(returnUrl)}`}
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg hover:opacity-80 mb-4"
-              style={{ backgroundColor: '#00FF41', color: '#000000' }}
-            >
-              SE CONNECTER
-            </a>
-            <div className="mt-6">
-              <a
-                href={`/${etablissementId}`}
-                className="text-gray-500 hover:text-gray-300 text-sm"
-              >
-                ← Retour au menu client
-              </a>
-            </div>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+            Chargement...
           </div>
         </div>
       );
@@ -260,46 +224,29 @@ const RestaurantOrderSystemWithAuth = () => {
 
   // Route tablette (PROTÉGÉE - nécessite authentification)
   if (page === 'tablette') {
-    // Si loading, afficher un loader
-    if (loading) {
+    // Vérifier si déconnexion en cours via sessionStorage
+    const isLoggingOutFromStorage = sessionStorage.getItem('isLoggingOut') === 'true';
+
+    // Si loading ou déconnexion en cours, afficher un loader
+    if (loading || isLoggingOut || isLoggingOutFromStorage) {
       return (
         <div className="min-h-screen bg-black flex items-center justify-center">
           <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
-            Chargement...
+            {(isLoggingOut || isLoggingOutFromStorage) ? 'Déconnexion en cours...' : 'Chargement...'}
           </div>
         </div>
       );
     }
 
-    // Si pas connecté, afficher écran d'accès réservé
+    // Si pas connecté, rediriger vers login
     if (!user) {
+      // Redirection immédiate sans afficher "Accès Refusé"
+      window.location.href = '/admin/login';
+      // Afficher un loader pendant la redirection
       return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4">
-          <div className="max-w-md text-center">
-            <div className="text-6xl mb-8" style={{ color: '#00FF41' }}>🔒</div>
-            <div className="text-3xl font-bold mb-4" style={{ color: '#00FF41' }}>
-              Accès Réservé
-            </div>
-            <div className="text-lg text-gray-400 mb-8">
-              Cette page est réservée au personnel.
-              <br />
-              Veuillez vous connecter pour continuer.
-            </div>
-            <a
-              href="/admin/login"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg hover:opacity-80"
-              style={{ backgroundColor: '#00FF41', color: '#000000' }}
-            >
-              SE CONNECTER
-            </a>
-            <div className="mt-6">
-              <a
-                href={`/${etablissementId}`}
-                className="text-gray-500 hover:text-gray-300 text-sm"
-              >
-                ← Retour au menu client
-              </a>
-            </div>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+            Chargement...
           </div>
         </div>
       );
@@ -1054,10 +1001,16 @@ const ClientInterface = ({ etablissementId }) => {
 
 // TabletInterface Component - Design Moderne
 const TabletInterface = ({ etablissementId }) => {
+  // ⚠️ VÉRIFICATION CRITIQUE AVANT TOUT - Empêche le flash pendant la déconnexion
+  if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
+    return null; // Ne rien rendre du tout
+  }
+
   const { logout } = useAuth();
   const { userRole, displayName } = useRole();
   const [orders, setOrders] = useState([]);
   const [etablissementName, setEtablissementName] = useState('');
+  const [isLocalLoggingOut, setIsLocalLoggingOut] = useState(false);
   // ============================================
   // PHASE 2.5 : STOP/START COMMANDES
   // ============================================
@@ -1066,8 +1019,22 @@ const TabletInterface = ({ etablissementId }) => {
 
   const handleLogout = async () => {
     if (window.confirm('Voulez-vous vous déconnecter ?')) {
-      await logout();
-      window.location.href = '/admin/login';
+      // Marquer la déconnexion dans sessionStorage
+      sessionStorage.setItem('isLoggingOut', 'true');
+
+      // MASQUER TOUT AVEC CSS !important - Impossible de contourner
+      const style = document.createElement('style');
+      style.id = 'logout-hide';
+      style.textContent = '* { display: none !important; } body::after { content: "Déconnexion..."; display: block !important; color: #00FF41; font-family: monospace; font-size: 20px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); }';
+      document.head.appendChild(style);
+
+      // Déconnexion puis redirection immédiate
+      try {
+        await logout();
+      } catch (e) {
+        // Ignorer les erreurs, rediriger quand même
+      }
+      window.location.replace('/admin/login');
     }
   };
 
@@ -1188,6 +1155,17 @@ const TabletInterface = ({ etablissementId }) => {
   const pendingOrders = orders.filter(o => o.status === 'pending');
   const inPreparationOrders = orders.filter(o => o.status === 'in_preparation');
   const readyOrders = orders.filter(o => o.status === 'ready');
+
+  // Si en train de se déconnecter, afficher loader
+  if (isLocalLoggingOut) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-xl font-mono" style={{ color: '#00FF41' }}>
+          Déconnexion en cours...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black p-4 sm:p-6">

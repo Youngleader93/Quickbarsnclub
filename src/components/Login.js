@@ -55,7 +55,7 @@ const Login = ({ onLoginSuccess }) => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3 tracking-tight" style={{ color: '#00FF41' }}>
-            QuickBar Admin
+            QuickBar
           </h1>
           <p className="text-gray-500 text-sm">Connexion administrateur</p>
           {returnUrl && (
