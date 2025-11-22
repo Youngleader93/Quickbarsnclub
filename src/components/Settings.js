@@ -16,9 +16,8 @@ const Settings = ({ etablissementId }) => {
   const [loadingServers, setLoadingServers] = useState(false);
   const [creatingServer, setCreatingServer] = useState(false);
   const [newServer, setNewServer] = useState({
-    email: '',
-    password: '',
-    displayName: ''
+    username: '',
+    password: ''
   });
 
   const [settings, setSettings] = useState({
@@ -103,7 +102,7 @@ const Settings = ({ etablissementId }) => {
   };
 
   const createServer = async () => {
-    if (!newServer.email || !newServer.password || !newServer.displayName) {
+    if (!newServer.username || !newServer.password) {
       showMessage('error', 'Veuillez remplir tous les champs');
       return;
     }
@@ -113,32 +112,41 @@ const Settings = ({ etablissementId }) => {
       return;
     }
 
+    // Valider l'identifiant (sans espaces, caractères spéciaux)
+    if (!/^[a-zA-Z0-9_-]+$/.test(newServer.username)) {
+      showMessage('error', 'L\'identifiant ne peut contenir que des lettres, chiffres, tirets et underscores');
+      return;
+    }
+
     setCreatingServer(true);
 
     try {
+      // Générer un email automatique à partir de l'identifiant
+      const generatedEmail = `${newServer.username}@${etablissementId}.local`;
+
       // Créer l'utilisateur dans Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        newServer.email,
+        generatedEmail,
         newServer.password
       );
 
       // Créer le document dans Firestore avec l'UID comme ID de document
       await setDoc(doc(db, 'users', userCredential.user.uid), {
-        email: newServer.email,
-        displayName: newServer.displayName,
+        username: newServer.username,
+        email: generatedEmail,
         role: 'serveur',
         etablissementId: etablissementId,
         createdAt: new Date().toISOString()
       });
 
-      showMessage('success', `Serveur ${newServer.displayName} créé avec succès`);
-      setNewServer({ email: '', password: '', displayName: '' });
+      showMessage('success', `Serveur "${newServer.username}" créé avec succès`);
+      setNewServer({ username: '', password: '' });
       loadServers();
     } catch (error) {
       console.error('Erreur création serveur:', error);
       if (error.code === 'auth/email-already-in-use') {
-        showMessage('error', 'Cet email est déjà utilisé');
+        showMessage('error', 'Cet identifiant existe déjà');
       } else {
         showMessage('error', `Erreur: ${error.message}`);
       }
@@ -426,22 +434,13 @@ const Settings = ({ etablissementId }) => {
         {/* Formulaire de création */}
         <div className="mb-6">
           <h4 className="text-sm font-medium text-gray-400 mb-3">Créer un nouveau serveur</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <input
                 type="text"
-                placeholder="Nom d'affichage"
-                value={newServer.displayName}
-                onChange={(e) => setNewServer({ ...newServer, displayName: e.target.value })}
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
-              />
-            </div>
-            <div>
-              <input
-                type="email"
-                placeholder="Email"
-                value={newServer.email}
-                onChange={(e) => setNewServer({ ...newServer, email: e.target.value })}
+                placeholder="Identifiant (ex: serveur1)"
+                value={newServer.username}
+                onChange={(e) => setNewServer({ ...newServer, username: e.target.value })}
                 className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base"
               />
             </div>
@@ -487,8 +486,8 @@ const Settings = ({ etablissementId }) => {
                   className="flex items-center justify-between p-3 bg-gray-800/30 rounded-xl hover:bg-gray-800/50 transition-all"
                 >
                   <div className="flex-1">
-                    <p className="text-white font-medium text-sm sm:text-base">{server.displayName}</p>
-                    <p className="text-gray-500 text-xs sm:text-sm">{server.email}</p>
+                    <p className="text-white font-medium text-sm sm:text-base">{server.username}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm">Créé le {new Date(server.createdAt).toLocaleDateString('fr-FR')}</p>
                   </div>
                   <button
                     onClick={() => deleteServer(server.id)}
@@ -503,7 +502,19 @@ const Settings = ({ etablissementId }) => {
           )}
         </div>
 
-        <div className="mt-4 p-3 bg-yellow-500/10 rounded-xl">
+        <div className="mt-4 p-3 bg-blue-500/10 rounded-xl space-y-2">
+          <p className="text-xs sm:text-sm text-blue-400">
+            ℹ️ <strong>Connexion des serveurs :</strong>
+          </p>
+          <p className="text-xs sm:text-sm text-blue-400">
+            • Identifiant : <code className="bg-gray-800/50 px-2 py-1 rounded">identifiant@{etablissementId}.local</code>
+          </p>
+          <p className="text-xs sm:text-sm text-blue-400">
+            • Mot de passe : celui que vous avez défini
+          </p>
+        </div>
+
+        <div className="mt-3 p-3 bg-yellow-500/10 rounded-xl">
           <p className="text-xs sm:text-sm text-yellow-400">
             ⚠️ Les serveurs ont uniquement accès à la tablette et ne peuvent pas modifier les paramètres
           </p>

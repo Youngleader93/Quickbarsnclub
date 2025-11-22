@@ -58,7 +58,7 @@ export const RoleProvider = ({ children }) => {
         const role = userData.role || null;
 
         setUserRole(role);
-        setDisplayName(userData.displayName || userData.email || 'Utilisateur');
+        setDisplayName(userData.username || userData.displayName || userData.email || 'Utilisateur');
 
         // Super-admin n'a pas besoin de clubAccess (accès à tout)
         if (role === 'super_admin') {
