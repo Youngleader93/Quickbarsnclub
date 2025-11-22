@@ -45,18 +45,21 @@ const ClubsManager = () => {
 
   const loadClubAdmins = async () => {
     try {
+      console.log('🔍 Chargement des admins de clubs...');
       // Charger tous les club_admin
       const q = query(
         collection(db, 'users'),
         where('role', '==', 'club_admin')
       );
       const snapshot = await getDocs(q);
+      console.log(`✅ ${snapshot.docs.length} admin(s) club_admin trouvé(s)`);
 
       // Organiser les admins par club
       const adminsByClub = {};
       snapshot.docs.forEach(doc => {
         const userData = doc.data();
         const clubAccess = userData.clubAccess || [];
+        console.log(`👤 Admin: ${userData.email} (${userData.displayName || 'pas de nom'}) - clubAccess:`, clubAccess);
 
         // Pour chaque club auquel cet admin a accès
         clubAccess.forEach(clubId => {
@@ -70,6 +73,7 @@ const ClubsManager = () => {
         });
       });
 
+      console.log('📊 Mapping admins par club:', adminsByClub);
       setClubAdmins(adminsByClub);
     } catch (error) {
       console.error('Erreur chargement admins:', error);
