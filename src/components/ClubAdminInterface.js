@@ -7,11 +7,6 @@ import OrderHistory from './OrderHistory';
 import Settings from './Settings';
 
 const ClubAdminInterface = ({ clubId }) => {
-  // ⚠️ VÉRIFICATION CRITIQUE AVANT TOUT - Empêche le flash pendant la déconnexion
-  if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
-    return null; // Ne rien rendre du tout
-  }
-
   const { user, logout, isLoggingOut } = useAuth();
   const { canAccessAdmin, isSuperAdmin, isServeur, userRole, displayName, isInitialized, clubAccess } = useRole();
   // Initialiser avec null, puis définir selon le rôle dans useEffect
@@ -45,6 +40,11 @@ const ClubAdminInterface = ({ clubId }) => {
       setActiveTab('menu');
     }
   }, [isInitialized, activeTab]);
+
+  // ⚠️ VÉRIFICATION CRITIQUE - Empêche le flash pendant la déconnexion
+  if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
+    return null; // Ne rien rendre du tout
+  }
 
   // Attendre que tout soit initialisé ET que l'onglet par défaut soit défini
   // Note: isLoggingOut est géré globalement dans App.js

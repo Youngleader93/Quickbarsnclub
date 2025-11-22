@@ -17,7 +17,13 @@ import ClubRegistrationForm from './components/ClubRegistrationForm';
 
 // Wrapper pour la logique principale avec auth
 const RestaurantOrderSystemWithAuth = () => {
-  // ⚠️ VÉRIFICATION CRITIQUE AVANT TOUT - Empêche tout flash pendant la déconnexion
+  const { user, loading, isLoggingOut } = useAuth();
+  const { userRole, clubAccess, isSuperAdmin, isInitialized } = useRole();
+  const pathParts = window.location.pathname.split('/').filter(p => p);
+  const firstPart = pathParts[0] || 'demo';
+  const secondPart = pathParts[1] || '';
+
+  // ⚠️ VÉRIFICATION CRITIQUE - Empêche tout flash pendant la déconnexion
   if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -27,12 +33,6 @@ const RestaurantOrderSystemWithAuth = () => {
       </div>
     );
   }
-
-  const { user, loading, isLoggingOut } = useAuth();
-  const { userRole, clubAccess, isSuperAdmin, isInitialized } = useRole();
-  const pathParts = window.location.pathname.split('/').filter(p => p);
-  const firstPart = pathParts[0] || 'demo';
-  const secondPart = pathParts[1] || '';
 
   // LOADER PENDANT DÉCONNEXION (doublon de sécurité)
   if (isLoggingOut) {
@@ -1001,11 +1001,6 @@ const ClientInterface = ({ etablissementId }) => {
 
 // TabletInterface Component - Design Moderne
 const TabletInterface = ({ etablissementId }) => {
-  // ⚠️ VÉRIFICATION CRITIQUE AVANT TOUT - Empêche le flash pendant la déconnexion
-  if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
-    return null; // Ne rien rendre du tout
-  }
-
   const { logout } = useAuth();
   const { userRole, displayName } = useRole();
   const [orders, setOrders] = useState([]);
@@ -1155,6 +1150,11 @@ const TabletInterface = ({ etablissementId }) => {
   const pendingOrders = orders.filter(o => o.status === 'pending');
   const inPreparationOrders = orders.filter(o => o.status === 'in_preparation');
   const readyOrders = orders.filter(o => o.status === 'ready');
+
+  // ⚠️ VÉRIFICATION CRITIQUE - Empêche le flash pendant la déconnexion
+  if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
+    return null; // Ne rien rendre du tout
+  }
 
   // Si en train de se déconnecter, afficher loader
   if (isLocalLoggingOut) {
