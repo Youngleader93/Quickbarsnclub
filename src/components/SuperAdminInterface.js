@@ -12,6 +12,8 @@ const SuperAdminInterface = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [clubRevenue, setClubRevenue] = useState({});
+  const [loadingRevenue, setLoadingRevenue] = useState(false);
   const [stats, setStats] = useState({
     totalClubs: 0,
     activeClubs: 0,
@@ -38,12 +40,54 @@ const SuperAdminInterface = () => {
       setStats({
         totalClubs: clubsData.length,
         activeClubs: clubsData.filter(c => c.actif).length,
-        totalRevenue: 0 // TODO: Phase 4
+        totalRevenue: 0
       });
+
+      // Charger le CA après avoir chargé les clubs
+      loadRevenue(clubsData);
     } catch (error) {
       console.error('Erreur chargement clubs:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadRevenue = async (clubsData) => {
+    try {
+      setLoadingRevenue(true);
+      console.log('💰 Chargement du CA pour tous les clubs...');
+
+      let totalRevenue = 0;
+      const revenueByClub = {};
+
+      // Pour chaque club, charger ses commandes
+      for (const club of clubsData) {
+        try {
+          const commandesRef = collection(db, 'etablissements', club.id, 'commandes');
+          const snapshot = await getDocs(commandesRef);
+
+          let clubTotal = 0;
+          snapshot.docs.forEach(doc => {
+            const order = doc.data();
+            clubTotal += order.total || 0;
+          });
+
+          revenueByClub[club.id] = clubTotal;
+          totalRevenue += clubTotal;
+          console.log(`  📊 ${club.nom} (${club.id}): $${clubTotal.toFixed(2)}`);
+        } catch (error) {
+          console.error(`Erreur chargement CA pour ${club.id}:`, error);
+          revenueByClub[club.id] = 0;
+        }
+      }
+
+      console.log(`✅ CA Total: $${totalRevenue.toFixed(2)}`);
+      setClubRevenue(revenueByClub);
+      setStats(prev => ({ ...prev, totalRevenue }));
+    } catch (error) {
+      console.error('Erreur chargement CA:', error);
+    } finally {
+      setLoadingRevenue(false);
     }
   };
 
@@ -173,8 +217,10 @@ const SuperAdminInterface = () => {
             <div className="text-4xl sm:text-5xl font-bold" style={{ color: '#00FF41' }}>{stats.activeClubs}</div>
           </div>
           <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-5 sm:p-6 shadow-xl">
-            <div className="text-gray-500 text-xs sm:text-sm mb-2">CA Total (Phase 4)</div>
-            <div className="text-4xl sm:text-5xl font-bold text-gray-700">-</div>
+            <div className="text-gray-500 text-xs sm:text-sm mb-2">CA Total</div>
+            <div className="text-4xl sm:text-5xl font-bold" style={{ color: loadingRevenue ? '#666' : '#00FF41' }}>
+              {loadingRevenue ? '...' : `$${stats.totalRevenue.toFixed(2)}`}
+            </div>
           </div>
         </div>
 
@@ -206,6 +252,9 @@ const SuperAdminInterface = () => {
                     <div className="min-w-0">
                       <div className="font-semibold text-white text-base sm:text-lg truncate">{club.nom}</div>
                       <div className="text-xs sm:text-sm text-gray-500 truncate">ID: {club.id}</div>
+                      <div className="text-xs sm:text-sm font-semibold mt-1" style={{ color: '#00FF41' }}>
+                        💰 CA: {loadingRevenue ? '...' : `$${(clubRevenue[club.id] || 0).toFixed(2)}`}
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-3 sm:gap-3 w-full sm:w-auto">
