@@ -156,6 +156,13 @@ const RestaurantOrderSystemWithAuth = () => {
     }
 
     // Si connecté, rediriger selon le rôle
+    // Serveur → rediriger vers la tablette de son établissement
+    if (userRole === 'serveur' && clubAccess && clubAccess.length > 0) {
+      const clubId = clubAccess[0];
+      window.location.href = `/${clubId}/tablette`;
+      return null;
+    }
+
     // Super admin → SuperAdminInterface
     if (isSuperAdmin()) {
       return <SuperAdminInterface />;
