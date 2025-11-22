@@ -58,8 +58,9 @@ const ClubsManager = () => {
       const adminsByClub = {};
       snapshot.docs.forEach(doc => {
         const userData = doc.data();
-        const clubAccess = userData.clubAccess || [];
-        console.log(`👤 Admin: ${userData.email} (${userData.displayName || 'pas de nom'}) - clubAccess:`, clubAccess);
+        // Support des deux noms de champs: clubAccess (nouveau) et etablissements (ancien)
+        const clubAccess = userData.clubAccess || userData.etablissements || [];
+        console.log(`👤 Admin: ${userData.email} (${userData.displayName || 'pas de nom'}) - clubAccess/etablissements:`, clubAccess);
 
         // Pour chaque club auquel cet admin a accès
         clubAccess.forEach(clubId => {
