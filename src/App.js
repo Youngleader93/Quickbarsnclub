@@ -23,6 +23,11 @@ const RestaurantOrderSystemWithAuth = () => {
   const firstPart = pathParts[0] || 'demo';
   const secondPart = pathParts[1] || '';
 
+  // Nettoyer le marqueur de déconnexion si on est sur /admin/login
+  if (typeof window !== 'undefined' && firstPart === 'admin' && secondPart === 'login') {
+    sessionStorage.removeItem('isLoggingOut');
+  }
+
   // ⚠️ VÉRIFICATION CRITIQUE - Empêche tout flash pendant la déconnexion
   if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
     return (
