@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, query, where, orderBy, getDocs, Timestamp } from 'firebase/firestore';
-import { Calendar, Clock, DollarSign, Package } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Package, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const OrderHistory = ({ etablissementId }) => {
   const [orders, setOrders] = useState([]);
@@ -104,6 +105,38 @@ const OrderHistory = ({ etablissementId }) => {
     );
   };
 
+  const exportToExcel = () => {
+    // Préparer les données pour Excel
+    const excelData = filteredOrders.map(order => {
+      const date = new Date(order.deliveredAt || order.timestamp);
+      const dateStr = date.toLocaleDateString('fr-FR');
+      const timeStr = date.toLocaleTimeString('fr-FR');
+      const itemsText = order.items.map(item => `${item.quantity}x ${item.name}`).join(', ');
+
+      return {
+        'Numéro': order.number,
+        'Date': dateStr,
+        'Heure': timeStr,
+        'Articles': itemsText,
+        'Sous-total': order.subtotal?.toFixed(2) || '0.00',
+        'Pourboire': order.tip?.toFixed(2) || '0.00',
+        'Total': order.total.toFixed(2)
+      };
+    });
+
+    // Créer le workbook et la feuille
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+
+    // Générer le nom de fichier avec date
+    const today = new Date();
+    const filename = `transactions_${etablissementId}_${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}.xlsx`;
+
+    // Télécharger le fichier
+    XLSX.writeFile(wb, filename);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -127,6 +160,14 @@ const OrderHistory = ({ etablissementId }) => {
             {filteredOrders.length} commandes • Total : ${monthTotal.toFixed(2)}
           </p>
         </div>
+        <button
+          onClick={exportToExcel}
+          disabled={filteredOrders.length === 0}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black rounded-xl font-semibold transition-all shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+        >
+          <Download size={16} />
+          Exporter Excel
+        </button>
       </div>
 
       {/* Filtres par mois */}
