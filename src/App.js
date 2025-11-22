@@ -1185,37 +1185,26 @@ const TabletInterface = ({ etablissementId }) => {
   return (
     <div className="min-h-screen bg-black p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Club name and role indicator in top-right */}
+        {/* Club name and logout button in top-right */}
         <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex flex-col items-end gap-2">
-          {etablissementName && (
-            <h2 className="text-base sm:text-xl font-bold text-white">
-              {etablissementName}
-            </h2>
-          )}
-          {/* Role indicator and logout */}
-          <div className="flex items-center gap-2">
-            {userRole === 'serveur' ? (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                <span className="text-xs sm:text-sm font-medium text-blue-400">Accès serveur</span>
-                {displayName && <span className="text-xs text-blue-300">({displayName})</span>}
-              </div>
-            ) : userRole === 'club_admin' || userRole === 'super_admin' ? (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span className="text-xs sm:text-sm font-medium text-green-400">Accès admin</span>
-                {displayName && <span className="text-xs text-green-300">({displayName})</span>}
-              </div>
-            ) : null}
-            {/* Logout button */}
-            <button
-              onClick={handleLogout}
-              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-all shadow-lg"
-              title="Se déconnecter"
-            >
-              Déconnexion
-            </button>
+          <div className="text-right">
+            {etablissementName && (
+              <h2 className="text-base sm:text-xl font-bold text-white">
+                {etablissementName}
+              </h2>
+            )}
+            {userRole === 'serveur' && (
+              <p className="text-xs sm:text-sm text-gray-400 italic">serveur</p>
+            )}
           </div>
+          {/* Logout button */}
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-all shadow-lg"
+            title="Se déconnecter"
+          >
+            Déconnexion
+          </button>
         </div>
 
         <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl">
