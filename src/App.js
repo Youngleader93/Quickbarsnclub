@@ -1047,6 +1047,7 @@ const ClientInterface = ({ etablissementId }) => {
 
 // TabletInterface Component - Design Moderne
 const TabletInterface = ({ etablissementId }) => {
+  const { logout } = useAuth();
   const { userRole, displayName } = useRole();
   const [orders, setOrders] = useState([]);
   const [etablissementName, setEtablissementName] = useState('');
@@ -1055,6 +1056,13 @@ const TabletInterface = ({ etablissementId }) => {
   // ============================================
   const [ordersOpen, setOrdersOpen] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleLogout = async () => {
+    if (window.confirm('Voulez-vous vous déconnecter ?')) {
+      await logout();
+      window.location.href = '/admin/login';
+    }
+  };
 
   // Écoute en temps réel du statut ordersOpen + initialisation
   useEffect(() => {
@@ -1184,20 +1192,30 @@ const TabletInterface = ({ etablissementId }) => {
               {etablissementName}
             </h2>
           )}
-          {/* Role indicator */}
-          {userRole === 'serveur' ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-              <span className="text-xs sm:text-sm font-medium text-blue-400">Accès serveur</span>
-              {displayName && <span className="text-xs text-blue-300">({displayName})</span>}
-            </div>
-          ) : userRole === 'club_admin' || userRole === 'super_admin' ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <span className="text-xs sm:text-sm font-medium text-green-400">Accès admin</span>
-              {displayName && <span className="text-xs text-green-300">({displayName})</span>}
-            </div>
-          ) : null}
+          {/* Role indicator and logout */}
+          <div className="flex items-center gap-2">
+            {userRole === 'serveur' ? (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-xs sm:text-sm font-medium text-blue-400">Accès serveur</span>
+                {displayName && <span className="text-xs text-blue-300">({displayName})</span>}
+              </div>
+            ) : userRole === 'club_admin' || userRole === 'super_admin' ? (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-xs sm:text-sm font-medium text-green-400">Accès admin</span>
+                {displayName && <span className="text-xs text-green-300">({displayName})</span>}
+              </div>
+            ) : null}
+            {/* Logout button */}
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-all shadow-lg"
+              title="Se déconnecter"
+            >
+              Déconnexion
+            </button>
+          </div>
         </div>
 
         <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl">
