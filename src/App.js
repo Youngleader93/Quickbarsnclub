@@ -1114,13 +1114,17 @@ const TabletInterface = ({ etablissementId }) => {
     }
   };
 
-  const deleteOrder = async (orderId) => {
+  const markAsDelivered = async (orderId) => {
     try {
-      await deleteDoc(
-        doc(db, 'etablissements', etablissementId, 'commandes', orderId)
+      await updateDoc(
+        doc(db, 'etablissements', etablissementId, 'commandes', orderId),
+        {
+          status: 'delivered',
+          deliveredAt: new Date().toISOString()
+        }
       );
     } catch (error) {
-      console.error('Erreur suppression:', error);
+      console.error('Erreur marquage livré:', error);
     }
   };
 
@@ -1152,9 +1156,11 @@ const TabletInterface = ({ etablissementId }) => {
     }
   };
 
+  // Filtrer uniquement les commandes actives (pas delivered)
   const pendingOrders = orders.filter(o => o.status === 'pending');
   const inPreparationOrders = orders.filter(o => o.status === 'in_preparation');
   const readyOrders = orders.filter(o => o.status === 'ready');
+  // Les commandes delivered sont cachées de la vue tablette (visibles dans historique)
 
   // ⚠️ VÉRIFICATION CRITIQUE - Empêche le flash pendant la déconnexion
   if (typeof window !== 'undefined' && sessionStorage.getItem('isLoggingOut') === 'true') {
@@ -1396,10 +1402,10 @@ const TabletInterface = ({ etablissementId }) => {
                       )}
                     </div>
                     <button
-                      onClick={() => deleteOrder(order.id)}
-                      className="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-red-500/20"
+                      onClick={() => markAsDelivered(order.id)}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-green-500/30"
                     >
-                      Retirer (Livrée)
+                      ✓ Marquer Livrée
                     </button>
                   </div>
                 ))}

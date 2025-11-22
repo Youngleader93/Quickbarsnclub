@@ -21,17 +21,22 @@ const OrderHistory = ({ etablissementId }) => {
       threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
       const ordersRef = collection(db, 'etablissements', etablissementId, 'commandes');
-      const q = query(
-        ordersRef,
-        where('timestamp', '>=', threeMonthsAgo.toISOString()),
-        orderBy('timestamp', 'desc')
-      );
 
-      const snapshot = await getDocs(q);
-      const ordersData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      // Charger toutes les commandes des 3 derniers mois
+      const snapshot = await getDocs(ordersRef);
+
+      // Filtrer : delivered + 3 derniers mois
+      const ordersData = snapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(order =>
+          order.status === 'delivered' &&
+          order.deliveredAt &&
+          order.deliveredAt >= threeMonthsAgo.toISOString()
+        )
+        .sort((a, b) => b.deliveredAt.localeCompare(a.deliveredAt)); // Trier par date de livraison décroissante
 
       setOrders(ordersData);
     } catch (error) {
@@ -56,10 +61,10 @@ const OrderHistory = ({ etablissementId }) => {
 
   const months = getLastMonths();
 
-  // Filtrer par mois
+  // Filtrer par mois (utilise deliveredAt au lieu de timestamp)
   const filteredOrders = orders.filter(order => {
     if (selectedMonth === 'all') return true;
-    const orderDate = new Date(order.timestamp);
+    const orderDate = new Date(order.deliveredAt || order.timestamp);
     const orderMonth = `${orderDate.getFullYear()}-${String(orderDate.getMonth() + 1).padStart(2, '0')}`;
     return orderMonth === selectedMonth;
   });
@@ -88,9 +93,10 @@ const OrderHistory = ({ etablissementId }) => {
     const badges = {
       pending: { label: 'En attente', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' },
       ready: { label: 'Prête', color: 'bg-green-500/10 text-green-400 border-green-500/30' },
+      delivered: { label: '✓ Livrée', color: 'bg-green-500/10 text-green-400 border-green-500/30' },
       completed: { label: 'Terminée', color: 'bg-gray-500/10 text-gray-400 border-gray-500/30' }
     };
-    const badge = badges[status] || badges.pending;
+    const badge = badges[status] || badges.delivered;
     return (
       <span className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium border ${badge.color}`}>
         {badge.label}
@@ -137,7 +143,7 @@ const OrderHistory = ({ etablissementId }) => {
         </button>
         {months.map(month => {
           const count = orders.filter(order => {
-            const orderDate = new Date(order.timestamp);
+            const orderDate = new Date(order.deliveredAt || order.timestamp);
             const orderMonth = `${orderDate.getFullYear()}-${String(orderDate.getMonth() + 1).padStart(2, '0')}`;
             return orderMonth === month.key;
           }).length;
@@ -182,11 +188,11 @@ const OrderHistory = ({ etablissementId }) => {
                 <div className="flex flex-col sm:items-end gap-1">
                   <div className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm">
                     <Calendar size={14} />
-                    <span>{formatDate(order.timestamp)}</span>
+                    <span>{formatDate(order.deliveredAt || order.timestamp)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm">
                     <Clock size={14} />
-                    <span>{formatTime(order.timestamp)}</span>
+                    <span>{formatTime(order.deliveredAt || order.timestamp)}</span>
                   </div>
                 </div>
               </div>

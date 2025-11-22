@@ -55,33 +55,45 @@ const SuperAdminInterface = () => {
   const loadRevenue = async (clubsData) => {
     try {
       setLoadingRevenue(true);
-      console.log('💰 Chargement du CA pour tous les clubs...');
+      console.log('💰 Chargement du CA pour tous les clubs (3 derniers mois, delivered uniquement)...');
+
+      // Date il y a 3 mois
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      const threeMonthsAgoISO = threeMonthsAgo.toISOString();
 
       let totalRevenue = 0;
       const revenueByClub = {};
 
-      // Pour chaque club, charger ses commandes
+      // Pour chaque club, charger ses commandes delivered des 3 derniers mois
       for (const club of clubsData) {
         try {
           const commandesRef = collection(db, 'etablissements', club.id, 'commandes');
           const snapshot = await getDocs(commandesRef);
 
           let clubTotal = 0;
+          let deliveredCount = 0;
           snapshot.docs.forEach(doc => {
             const order = doc.data();
-            clubTotal += order.total || 0;
+            // Filtrer : delivered + derniers 3 mois
+            if (order.status === 'delivered' &&
+                order.deliveredAt &&
+                order.deliveredAt >= threeMonthsAgoISO) {
+              clubTotal += order.total || 0;
+              deliveredCount++;
+            }
           });
 
           revenueByClub[club.id] = clubTotal;
           totalRevenue += clubTotal;
-          console.log(`  📊 ${club.nom} (${club.id}): $${clubTotal.toFixed(2)}`);
+          console.log(`  📊 ${club.nom} (${club.id}): $${clubTotal.toFixed(2)} (${deliveredCount} commandes livrées)`);
         } catch (error) {
           console.error(`Erreur chargement CA pour ${club.id}:`, error);
           revenueByClub[club.id] = 0;
         }
       }
 
-      console.log(`✅ CA Total: $${totalRevenue.toFixed(2)}`);
+      console.log(`✅ CA Total (3 mois): $${totalRevenue.toFixed(2)}`);
       setClubRevenue(revenueByClub);
       setStats(prev => ({ ...prev, totalRevenue }));
     } catch (error) {
