@@ -28,11 +28,14 @@ const UsersManager = () => {
       console.log('🔍 Chargement des utilisateurs...');
       const usersQuery = query(collection(db, 'users'), orderBy('email'));
       const usersSnapshot = await getDocs(usersQuery);
-      const usersData = usersSnapshot.docs.map(doc => ({
-        uid: doc.id,
-        ...doc.data()
-      }));
-      console.log('✅ Utilisateurs chargés:', usersData.length);
+      const usersData = usersSnapshot.docs
+        .map(doc => ({
+          uid: doc.id,
+          ...doc.data()
+        }))
+        // Filtrer les serveurs - ils sont gérés au niveau club
+        .filter(user => user.role !== 'serveur');
+      console.log('✅ Utilisateurs chargés (hors serveurs):', usersData.length);
       setUsers(usersData);
 
       // Charger les clubs pour la sélection
