@@ -450,16 +450,33 @@ const ClientInterface = ({ etablissementId }) => {
     if (!currentOrderId) return;
 
     const orderRef = doc(db, 'etablissements', etablissementId, 'commandes', currentOrderId);
-    
+
     const unsubscribe = onSnapshot(orderRef, (docSnap) => {
       if (docSnap.exists()) {
         const orderData = { id: docSnap.id, ...docSnap.data() };
         setCurrentOrder(orderData);
-        
+
         if (orderData.status === 'ready') {
           setShowCart(true);
         }
+
+        // Si la commande est livrée/retirée, réinitialiser l'état du client
+        if (orderData.status === 'delivered') {
+          console.log('Commande retirée, réinitialisation...');
+          // Attendre 3 secondes pour que l'utilisateur voie le statut final
+          setTimeout(() => {
+            localStorage.removeItem(`currentOrderNumber_${etablissementId}`);
+            localStorage.removeItem(`currentOrderId_${etablissementId}`);
+            setCurrentOrder(null);
+            setCurrentOrderNumber(null);
+            setCurrentOrderId(null);
+            setHasActiveOrder(false);
+            setShowCart(false);
+            setQuantities({});
+          }, 3000);
+        }
       } else {
+        // Commande supprimée de la base de données
         localStorage.removeItem(`currentOrderNumber_${etablissementId}`);
         localStorage.removeItem(`currentOrderId_${etablissementId}`);
         setCurrentOrder(null);
