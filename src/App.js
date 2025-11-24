@@ -635,16 +635,37 @@ const ClientInterface = ({ etablissementId }) => {
             {t('addTip')}
           </h2>
 
-          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-5 mb-6 shadow-xl border border-gray-800/50">
-            <div className="flex justify-between mb-4 text-gray-300 text-xl sm:text-2xl">
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 mb-6 shadow-xl border border-gray-800/50">
+            {/* Liste des produits */}
+            <div className="mb-6 pb-6 border-b border-gray-700/50 space-y-3">
+              {menu
+                .filter(item => quantities[item.id] > 0)
+                .map(item => (
+                  <div key={item.id} className="flex justify-between items-center text-lg sm:text-xl text-gray-300">
+                    <span className="font-normal">
+                      {quantities[item.id]}X {item.name}
+                    </span>
+                    <span className="font-light text-gray-400">
+                      ${(item.price * quantities[item.id]).toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+            </div>
+
+            {/* Subtotal */}
+            <div className="flex justify-between mb-6 text-gray-300 text-2xl sm:text-3xl py-3">
               <span className="font-normal">{t('subtotal')}</span>
               <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between mb-5 text-gray-300 text-xl sm:text-2xl">
+
+            {/* Tip */}
+            <div className="flex justify-between mb-6 text-gray-300 text-2xl sm:text-3xl py-3">
               <span className="font-normal">{t('tip')}</span>
               <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${tipAmount.toFixed(2)}</span>
             </div>
-            <div className="pt-5 mt-5 border-t border-gray-700/50 flex justify-between text-4xl sm:text-5xl">
+
+            {/* Total */}
+            <div className="pt-6 mt-6 border-t border-gray-700/50 flex justify-between text-4xl sm:text-5xl py-3">
               <span className="font-normal text-white">{t('total')}</span>
               <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${total.toFixed(2)}</span>
             </div>
