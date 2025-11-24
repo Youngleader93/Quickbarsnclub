@@ -985,16 +985,16 @@ const ClientInterface = ({ etablissementId }) => {
 
       {getTotalItems() > 0 && !hasActiveOrder && (
         <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md shadow-2xl z-10">
-          <div className="w-full px-3 py-4 sm:py-5">
-            <div className="flex justify-between mb-3 sm:mb-4 text-lg sm:text-xl text-white">
+          <div className="w-full px-3 py-5 sm:py-6">
+            <div className="flex justify-between mb-4 text-2xl sm:text-3xl text-white">
               <span className="font-medium">{getTotalItems()} {getTotalItems() > 1 ? t('items') : t('item')}</span>
-              <span className="text-2xl sm:text-3xl font-bold" style={{ color: '#00FF41' }}>${getTotalPrice().toFixed(2)}</span>
+              <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#00FF41' }}>${getTotalPrice().toFixed(2)}</span>
             </div>
             <button
               onClick={handleValidate}
-              className="w-full py-4 sm:py-5 rounded-xl font-semibold text-lg sm:text-xl flex items-center justify-center gap-2 sm:gap-3 transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
+              className="w-full py-6 sm:py-8 rounded-xl font-semibold text-2xl sm:text-3xl flex items-center justify-center gap-3 transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30 hover:scale-[1.02]"
             >
-              <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
+              <ShoppingCart size={24} className="sm:w-8 sm:h-8" />
               {t('validate')}
             </button>
           </div>
