@@ -630,7 +630,7 @@ const ClientInterface = ({ etablissementId }) => {
 
     return (
       <div className="h-screen bg-black px-3 flex items-center justify-center overflow-y-auto">
-        <div className="w-full max-h-screen py-4">
+        <div className="w-full max-h-screen py-4" style={{ transform: 'translateY(-5%)' }}>
           <h2 className="text-5xl sm:text-6xl font-light mb-6 text-center tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
             {t('addTip')}
           </h2>
@@ -729,13 +729,13 @@ const ClientInterface = ({ etablissementId }) => {
 
   if (hasActiveOrder && !showCart) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-black">
-        <div className="max-w-md text-center">
-          <div className="text-xl mb-4" style={{ color: '#00FF41' }}>{t('orderProcessing')}</div>
-          <div className="text-gray-400 mb-4">
+      <div className="h-screen flex items-center justify-center px-4 bg-black">
+        <div className="w-full text-center">
+          <div className="text-4xl sm:text-5xl mb-8 font-light tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>{t('orderProcessing')}</div>
+          <div className="text-gray-300 mb-6 text-2xl sm:text-3xl">
             {t('yourOrder')} #{currentOrderNumber} {t('orderInProgress')}.
           </div>
-          <div className="text-gray-500 text-sm">
+          <div className="text-gray-400 text-xl sm:text-2xl">
             {t('newOrderAfter')}
           </div>
         </div>
@@ -747,7 +747,7 @@ const ClientInterface = ({ etablissementId }) => {
     const isReady = currentOrder.status === 'ready';
 
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-black">
+      <div className="h-screen flex items-center justify-center px-4 bg-black overflow-y-auto">
         <style>{`
           @keyframes pulseGlow {
             0%, 100% {
@@ -779,42 +779,42 @@ const ClientInterface = ({ etablissementId }) => {
           }
         `}</style>
 
-        <div className="max-w-md w-full text-center">
+        <div className="w-full text-center py-4">
           {isReady ? (
             <>
-              <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center pulse-animation">
-                <Check size={64} className="text-black" />
+              <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-10 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center pulse-animation">
+                <Check size={80} className="text-black sm:w-24 sm:h-24" />
               </div>
-              <h1 className="text-4xl font-light mb-6 tracking-wide uppercase text-flash" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
+              <h1 className="text-5xl sm:text-6xl font-light mb-8 tracking-wide uppercase text-flash" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
                 {t('orderReady')}
               </h1>
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8 shadow-xl border border-gray-800/50">
-                <p className="text-gray-400 text-sm mb-2 font-normal">{t('orderNumber')}</p>
-                <p className="text-6xl font-light mb-6 text-flash" style={{ color: '#00FF41', fontWeight: '300' }}>#{currentOrder.number}</p>
-                <div className="h-px bg-gray-700/50 mb-6"></div>
-                <p className="text-gray-400 text-sm mb-2 font-normal">{t('totalAmount')}</p>
-                <p className="text-3xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${currentOrder.total.toFixed(2)}</p>
+              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 sm:p-10 mb-10 shadow-xl border border-gray-800/50">
+                <p className="text-gray-400 text-xl sm:text-2xl mb-4 font-normal">{t('orderNumber')}</p>
+                <p className="text-7xl sm:text-8xl font-light mb-8 text-flash" style={{ color: '#00FF41', fontWeight: '300' }}>#{currentOrder.number}</p>
+                <div className="h-px bg-gray-700/50 mb-8"></div>
+                <p className="text-gray-400 text-xl sm:text-2xl mb-4 font-normal">{t('totalAmount')}</p>
+                <p className="text-4xl sm:text-5xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${currentOrder.total.toFixed(2)}</p>
               </div>
-              <p className="text-lg text-gray-300 leading-relaxed font-normal" style={{ fontWeight: '400' }}>
+              <p className="text-2xl sm:text-3xl text-gray-300 leading-relaxed font-normal" style={{ fontWeight: '400' }}>
                 {t('pickupOrder')}
               </p>
             </>
           ) : (
             <>
-              <div className="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center shadow-2xl shadow-green-500/50 animate-pulse">
-                <Check size={64} className="text-black" />
+              <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-10 rounded-full bg-gradient-to-r from-green-600 to-green-500 flex items-center justify-center shadow-2xl shadow-green-500/50 animate-pulse">
+                <Check size={80} className="text-black sm:w-24 sm:h-24" />
               </div>
-              <h1 className="text-4xl font-light mb-6 tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
+              <h1 className="text-5xl sm:text-6xl font-light mb-8 tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
                 {t('orderSent')}
               </h1>
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 mb-8 shadow-xl border border-gray-800/50">
-                <p className="text-gray-400 text-sm mb-2 font-normal">{t('orderNumber')}</p>
-                <p className="text-6xl font-light mb-6" style={{ color: '#00FF41', fontWeight: '300', textShadow: '0 0 20px rgba(0, 255, 65, 0.3)' }}>#{currentOrder.number}</p>
-                <div className="h-px bg-gray-700/50 mb-6"></div>
-                <p className="text-gray-400 text-sm mb-2 font-normal">{t('totalAmount')}</p>
-                <p className="text-3xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${currentOrder.total.toFixed(2)}</p>
+              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 sm:p-10 mb-10 shadow-xl border border-gray-800/50">
+                <p className="text-gray-400 text-xl sm:text-2xl mb-4 font-normal">{t('orderNumber')}</p>
+                <p className="text-7xl sm:text-8xl font-light mb-8" style={{ color: '#00FF41', fontWeight: '300', textShadow: '0 0 20px rgba(0, 255, 65, 0.3)' }}>#{currentOrder.number}</p>
+                <div className="h-px bg-gray-700/50 mb-8"></div>
+                <p className="text-gray-400 text-xl sm:text-2xl mb-4 font-normal">{t('totalAmount')}</p>
+                <p className="text-4xl sm:text-5xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${currentOrder.total.toFixed(2)}</p>
               </div>
-              <p className="text-lg text-gray-300 leading-relaxed font-normal" style={{ fontWeight: '400' }}>
+              <p className="text-2xl sm:text-3xl text-gray-300 leading-relaxed font-normal" style={{ fontWeight: '400' }}>
                 {t('notifiedWhenReady')}
               </p>
             </>
