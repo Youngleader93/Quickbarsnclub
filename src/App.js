@@ -834,7 +834,7 @@ const ClientInterface = ({ etablissementId }) => {
         {/* Club name in absolute top-left */}
         {etablissementName && (
           <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-            <h2 className="text-base sm:text-lg font-bold text-white truncate max-w-[40vw]">
+            <h2 className="text-lg sm:text-xl font-bold text-white truncate max-w-[40vw]">
               {etablissementName}
             </h2>
           </div>
@@ -850,7 +850,7 @@ const ClientInterface = ({ etablissementId }) => {
           )}
 
           <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl font-light tracking-tight" style={{
+            <h1 className="text-4xl sm:text-5xl font-light tracking-tight" style={{
               color: '#00FF41',
               fontWeight: '300',
               letterSpacing: '0.15em',
@@ -892,7 +892,7 @@ const ClientInterface = ({ etablissementId }) => {
                     <div className="w-full border-t border-gray-800"></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="px-3 sm:px-6 py-2 text-xl sm:text-2xl font-medium tracking-wide uppercase bg-black"
+                    <span className="px-3 sm:px-6 py-2 text-2xl sm:text-3xl font-medium tracking-wide uppercase bg-black"
                           style={{
                             color: '#00FF41',
                             textShadow: '0 0 20px rgba(0, 255, 65, 0.3)',
@@ -917,7 +917,7 @@ const ClientInterface = ({ etablissementId }) => {
                       <div className="flex items-center justify-between gap-3 sm:gap-6">
                         {/* Info produit */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg sm:text-xl font-normal mb-1 sm:mb-2 truncate transition-colors duration-200"
+                          <h3 className="text-xl sm:text-2xl font-normal mb-1 sm:mb-2 truncate transition-colors duration-200"
                               style={{
                                 color: '#00FF41',
                                 textShadow: '0 0 10px rgba(0, 255, 65, 0.2)',
@@ -927,7 +927,7 @@ const ClientInterface = ({ etablissementId }) => {
                             {item.name}
                           </h3>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-2xl sm:text-3xl font-light tracking-tight"
+                            <span className="text-3xl sm:text-4xl font-light tracking-tight"
                                   style={{
                                     color: '#00FF41',
                                     textShadow: '0 0 15px rgba(0, 255, 65, 0.3)',
@@ -986,13 +986,13 @@ const ClientInterface = ({ etablissementId }) => {
       {getTotalItems() > 0 && !hasActiveOrder && (
         <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md shadow-2xl z-10">
           <div className="w-full px-3 py-4 sm:py-5">
-            <div className="flex justify-between mb-3 sm:mb-4 text-base sm:text-lg text-white">
+            <div className="flex justify-between mb-3 sm:mb-4 text-lg sm:text-xl text-white">
               <span className="font-medium">{getTotalItems()} {getTotalItems() > 1 ? t('items') : t('item')}</span>
-              <span className="text-xl sm:text-2xl font-bold" style={{ color: '#00FF41' }}>${getTotalPrice().toFixed(2)}</span>
+              <span className="text-2xl sm:text-3xl font-bold" style={{ color: '#00FF41' }}>${getTotalPrice().toFixed(2)}</span>
             </div>
             <button
               onClick={handleValidate}
-              className="w-full py-4 sm:py-5 rounded-xl font-semibold text-base sm:text-lg flex items-center justify-center gap-2 sm:gap-3 transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
+              className="w-full py-4 sm:py-5 rounded-xl font-semibold text-lg sm:text-xl flex items-center justify-center gap-2 sm:gap-3 transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30"
             >
               <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
               {t('validate')}
