@@ -855,7 +855,7 @@ const ClientInterface = ({ etablissementId }) => {
         {/* Club name in absolute top-left */}
         {etablissementName && (
           <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-            <h2 className="text-lg sm:text-xl font-bold text-white truncate max-w-[40vw]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white truncate max-w-[45vw]">
               {etablissementName}
             </h2>
           </div>
