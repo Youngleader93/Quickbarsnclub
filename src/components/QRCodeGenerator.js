@@ -117,8 +117,8 @@ const QRCodeGenerator = ({ etablissementId }) => {
                 <QRCodeCanvas
                   id={`qr-table-${tableNumber}`}
                   value={tableUrl}
-                  size={180}
-                  className="sm:hidden"
+                  size={160}
+                  className="sm:hidden max-w-full h-auto"
                   level="H"
                   includeMargin={true}
                 />
@@ -126,7 +126,7 @@ const QRCodeGenerator = ({ etablissementId }) => {
                   id={`qr-table-${tableNumber}-desktop`}
                   value={tableUrl}
                   size={200}
-                  className="hidden sm:block"
+                  className="hidden sm:block max-w-full h-auto"
                   level="H"
                   includeMargin={true}
                 />
