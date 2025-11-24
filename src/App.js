@@ -629,22 +629,22 @@ const ClientInterface = ({ etablissementId }) => {
     const total = subtotal + tipAmount;
 
     return (
-      <div className="min-h-screen bg-black p-6 flex items-center justify-center">
-        <div className="max-w-md w-full">
-          <h2 className="text-3xl font-light mb-8 text-center tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
+      <div className="min-h-screen bg-black px-3 py-6 flex items-center justify-center">
+        <div className="w-full">
+          <h2 className="text-5xl sm:text-6xl font-light mb-6 text-center tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
             {t('addTip')}
           </h2>
 
-          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-xl border border-gray-800/50">
-            <div className="flex justify-between mb-3 text-gray-300 text-base">
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-5 mb-6 shadow-xl border border-gray-800/50">
+            <div className="flex justify-between mb-4 text-gray-300 text-xl sm:text-2xl">
               <span className="font-normal">{t('subtotal')}</span>
               <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between mb-4 text-gray-300 text-base">
+            <div className="flex justify-between mb-5 text-gray-300 text-xl sm:text-2xl">
               <span className="font-normal">{t('tip')}</span>
               <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${tipAmount.toFixed(2)}</span>
             </div>
-            <div className="pt-4 mt-4 border-t border-gray-700/50 flex justify-between text-2xl">
+            <div className="pt-5 mt-5 border-t border-gray-700/50 flex justify-between text-4xl sm:text-5xl">
               <span className="font-normal text-white">{t('total')}</span>
               <span className="font-light" style={{ color: '#00FF41', fontWeight: '300' }}>${total.toFixed(2)}</span>
             </div>
@@ -655,7 +655,7 @@ const ClientInterface = ({ etablissementId }) => {
               <button
                 key={percentage}
                 onClick={() => selectTipPercentage(percentage)}
-                className={`py-4 rounded-xl font-normal transition-all duration-200 hover:scale-105 ${
+                className={`py-6 rounded-xl font-normal transition-all duration-200 hover:scale-105 text-xl sm:text-2xl ${
                   tipAmount === (subtotal * percentage) / 100
                     ? 'bg-gradient-to-r from-green-600 to-green-500 text-black shadow-lg shadow-green-500/30'
                     : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50'
@@ -673,18 +673,18 @@ const ClientInterface = ({ etablissementId }) => {
                 value={customTip}
                 onChange={(e) => handleCustomTipChange(e.target.value)}
                 placeholder={t('customAmount')}
-                className="w-full bg-gray-800/50 p-4 rounded-xl text-center font-light focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                className="w-full bg-gray-800/50 p-6 rounded-xl text-center font-light focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-xl sm:text-2xl"
                 style={{ color: '#00FF41', fontWeight: '300' }}
               />
-              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                <span className="text-gray-500">$</span>
+              <div className="absolute inset-y-0 right-0 pr-6 flex items-center pointer-events-none">
+                <span className="text-gray-500 text-xl">$</span>
               </div>
             </div>
           </div>
 
           <button
             onClick={confirmOrderWithTip}
-            className="w-full py-5 rounded-xl font-normal text-lg mb-3 transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30 hover:scale-105"
+            className="w-full py-6 rounded-xl font-normal text-2xl sm:text-3xl mb-4 transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-black shadow-lg shadow-green-500/30 hover:scale-105"
             style={{ fontWeight: '400' }}
           >
             {t('confirm')}
@@ -696,7 +696,7 @@ const ClientInterface = ({ etablissementId }) => {
               setTipAmount(0);
               setCustomTip('');
             }}
-            className="w-full py-4 rounded-xl font-light text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all"
+            className="w-full py-5 rounded-xl font-light text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all text-xl sm:text-2xl"
             style={{ fontWeight: '300' }}
           >
             {t('back')}
