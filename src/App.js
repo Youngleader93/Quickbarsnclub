@@ -840,9 +840,9 @@ const ClientInterface = ({ etablissementId }) => {
           </div>
         )}
 
-        <div className="w-full px-2 py-4 sm:py-6">
+        <div className="w-full px-2 py-3 sm:py-4">
           {!ordersOpen && (
-            <div className="mb-4 mx-2 p-3 bg-red-500/10 rounded-xl text-center">
+            <div className="mb-3 mx-2 p-2 bg-red-500/10 rounded-xl text-center">
               <span className="text-red-400 text-sm font-medium">
                 {t('ordersClosed')}
               </span>
@@ -850,7 +850,7 @@ const ClientInterface = ({ etablissementId }) => {
           )}
 
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl font-light tracking-tight" style={{
+            <h1 className="text-5xl sm:text-6xl font-light tracking-tight" style={{
               color: '#00FF41',
               fontWeight: '300',
               letterSpacing: '0.15em',
@@ -862,7 +862,7 @@ const ClientInterface = ({ etablissementId }) => {
         </div>
       </div>
 
-      <div className="w-full px-2 py-6 sm:py-8 pb-32">
+      <div className="w-full px-2 py-4 pb-32">
         {/* Grouper par catégorie */}
         {(() => {
           // Définir toutes les catégories possibles
@@ -885,14 +885,14 @@ const ClientInterface = ({ etablissementId }) => {
           return allCategories
             .filter(cat => itemsByCategory[cat] && itemsByCategory[cat].length > 0)
             .map((category, idx) => (
-              <div key={category} className="mb-8">
+              <div key={category} className="mb-6">
                 {/* En-tête de catégorie avec design amélioré */}
-                <div className="relative mb-4">
+                <div className="relative mb-3">
                   <div className="absolute inset-0 flex items-center" aria-hidden="true">
                     <div className="w-full border-t border-gray-800"></div>
                   </div>
                   <div className="relative flex justify-center">
-                    <span className="px-3 sm:px-6 py-2 text-2xl sm:text-3xl font-medium tracking-wide uppercase bg-black"
+                    <span className="px-3 sm:px-6 py-1.5 text-3xl sm:text-4xl font-medium tracking-wide uppercase bg-black"
                           style={{
                             color: '#00FF41',
                             textShadow: '0 0 20px rgba(0, 255, 65, 0.3)',
@@ -905,11 +905,11 @@ const ClientInterface = ({ etablissementId }) => {
                 </div>
 
                 {/* Items de la catégorie avec design raffiné */}
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {itemsByCategory[category].map(item => (
                     <div
                       key={item.id}
-                      className="group relative bg-gradient-to-br from-gray-900/40 to-gray-900/20 backdrop-blur-md rounded-2xl p-3 sm:p-6 border border-gray-800/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10"
+                      className="group relative bg-gradient-to-br from-gray-900/40 to-gray-900/20 backdrop-blur-md rounded-2xl p-3 sm:p-5 border border-gray-800/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10"
                       style={{
                         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
                       }}
@@ -917,7 +917,7 @@ const ClientInterface = ({ etablissementId }) => {
                       <div className="flex items-center justify-between gap-3 sm:gap-6">
                         {/* Info produit */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-xl sm:text-2xl font-normal mb-1 sm:mb-2 truncate transition-colors duration-200"
+                          <h3 className="text-2xl sm:text-3xl font-normal mb-0.5 sm:mb-1 truncate transition-colors duration-200"
                               style={{
                                 color: '#00FF41',
                                 textShadow: '0 0 10px rgba(0, 255, 65, 0.2)',
@@ -927,7 +927,7 @@ const ClientInterface = ({ etablissementId }) => {
                             {item.name}
                           </h3>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-3xl sm:text-4xl font-light tracking-tight"
+                            <span className="text-4xl sm:text-5xl font-light tracking-tight"
                                   style={{
                                     color: '#00FF41',
                                     textShadow: '0 0 15px rgba(0, 255, 65, 0.3)',
@@ -940,19 +940,19 @@ const ClientInterface = ({ etablissementId }) => {
                         </div>
 
                         {/* Contrôles quantité */}
-                        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                           <button
                             onClick={() => handleQuantityChange(item.id, Math.max(0, (quantities[item.id] || 0) - 1))}
                             disabled={hasActiveOrder || !ordersOpen || !quantities[item.id]}
-                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-600 to-green-500 text-black font-light text-xl sm:text-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:from-green-500 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-green-500/40 hover:scale-105 active:scale-95"
+                            className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-green-600 to-green-500 text-black font-light text-2xl sm:text-3xl disabled:opacity-20 disabled:cursor-not-allowed hover:from-green-500 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-green-500/40 hover:scale-105 active:scale-95"
                             style={{ fontWeight: '400' }}
                           >
                             −
                           </button>
 
-                          <div className="w-12 sm:w-16 text-center flex-shrink-0">
-                            <div className="inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-black/50 border-2 border-green-500/30">
-                              <span className="text-2xl sm:text-3xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>
+                          <div className="w-14 sm:w-18 text-center flex-shrink-0">
+                            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-black/50 border-2 border-green-500/30">
+                              <span className="text-3xl sm:text-4xl font-light" style={{ color: '#00FF41', fontWeight: '300' }}>
                                 {quantities[item.id] || 0}
                               </span>
                             </div>
@@ -961,7 +961,7 @@ const ClientInterface = ({ etablissementId }) => {
                           <button
                             onClick={() => handleQuantityChange(item.id, Math.min(20, (quantities[item.id] || 0) + 1))}
                             disabled={hasActiveOrder || !ordersOpen || (quantities[item.id] || 0) >= 20}
-                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-600 to-green-500 text-black font-light text-xl sm:text-2xl disabled:opacity-20 disabled:cursor-not-allowed hover:from-green-500 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-green-500/40 hover:scale-105 active:scale-95"
+                            className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-green-600 to-green-500 text-black font-light text-2xl sm:text-3xl disabled:opacity-20 disabled:cursor-not-allowed hover:from-green-500 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-green-500/40 hover:scale-105 active:scale-95"
                             style={{ fontWeight: '400' }}
                           >
                             +
