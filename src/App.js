@@ -629,8 +629,8 @@ const ClientInterface = ({ etablissementId }) => {
     const total = subtotal + tipAmount;
 
     return (
-      <div className="min-h-screen bg-black px-3 py-6 flex items-center justify-center">
-        <div className="w-full">
+      <div className="h-screen bg-black px-3 flex items-center justify-center overflow-y-auto">
+        <div className="w-full max-h-screen py-4">
           <h2 className="text-5xl sm:text-6xl font-light mb-6 text-center tracking-wide uppercase" style={{ color: '#00FF41', fontWeight: '300', letterSpacing: '0.15em' }}>
             {t('addTip')}
           </h2>
