@@ -660,7 +660,7 @@ const ClientInterface = ({ etablissementId }) => {
                 .map(item => (
                   <div key={item.id} className="flex justify-between items-center text-lg sm:text-xl text-gray-300">
                     <span className="font-normal">
-                      {quantities[item.id]} x {item.name}
+                      {quantities[item.id]}x {item.name}
                     </span>
                     <span className="font-light text-gray-400">
                       ${(item.price * quantities[item.id]).toFixed(2)}
