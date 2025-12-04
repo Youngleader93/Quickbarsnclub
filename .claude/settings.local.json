@@ -10,7 +10,9 @@
       "Bash(firebase login:*)",
       "Bash(firebase deploy:*)",
       "Bash(firebase projects:list:*)",
-      "Bash(firebase use:*)"
+      "Bash(firebase use:*)",
+      "Bash(git rm:*)",
+      "Bash(firebase firestore:get:*)"
     ],
     "deny": [],
     "ask": []
