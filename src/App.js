@@ -453,18 +453,22 @@ const ClientInterface = ({ etablissementId }) => {
     if (!currentOrderId) return;
 
     const orderRef = doc(db, 'etablissements', etablissementId, 'commandes', currentOrderId);
+    let isDeliveredHandled = false; // Éviter les appels multiples
 
     const unsubscribe = onSnapshot(orderRef, (docSnap) => {
       if (docSnap.exists()) {
         const orderData = { id: docSnap.id, ...docSnap.data() };
 
-        // Si la commande est livrée, rester sur l'écran "Commande prête" puis retour au menu
-        if (orderData.status === 'delivered') {
-          console.log('Commande livrée, retour au menu dans 2s...');
-          // Forcer l'affichage "Commande prête" en gardant status='ready'
-          setCurrentOrder(prev => prev ? { ...prev, status: 'ready' } : prev);
+        // Si la commande est livrée, afficher "Commande prête" puis retour au menu
+        if (orderData.status === 'delivered' && !isDeliveredHandled) {
+          isDeliveredHandled = true;
+          console.log('Commande livrée! Affichage Commande Prête puis retour menu...');
+
+          // Forcer l'affichage de l'écran "Commande Prête"
+          setCurrentOrder({ ...orderData, status: 'ready' });
           setShowCart(true);
-          // Après 2 secondes, reset complet vers le menu
+
+          // Après 2 secondes, retour au menu
           setTimeout(() => {
             localStorage.removeItem(`currentOrderNumber_${etablissementId}`);
             localStorage.removeItem(`currentOrderId_${etablissementId}`);
@@ -478,11 +482,13 @@ const ClientInterface = ({ etablissementId }) => {
           return;
         }
 
-        // Mise à jour normale pour les autres statuts
-        setCurrentOrder(orderData);
+        // Mise à jour normale pour pending, in_preparation, ready
+        if (orderData.status !== 'delivered') {
+          setCurrentOrder(orderData);
 
-        if (orderData.status === 'ready') {
-          setShowCart(true);
+          if (orderData.status === 'ready') {
+            setShowCart(true);
+          }
         }
       } else {
         // Commande supprimée de la base de données
