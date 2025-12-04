@@ -466,7 +466,7 @@ const ClientInterface = ({ etablissementId }) => {
         // Si la commande est livrée/retirée, réinitialiser l'état du client
         if (orderData.status === 'delivered') {
           console.log('Commande retirée, réinitialisation...');
-          // Attendre 3 secondes pour que l'utilisateur voie le statut final
+          // Attendre 2 secondes pour que l'utilisateur voie le statut final
           setTimeout(() => {
             localStorage.removeItem(`currentOrderNumber_${etablissementId}`);
             localStorage.removeItem(`currentOrderId_${etablissementId}`);
@@ -476,7 +476,7 @@ const ClientInterface = ({ etablissementId }) => {
             setHasActiveOrder(false);
             setShowCart(false);
             setQuantities({});
-          }, 3000);
+          }, 2000);
         }
       } else {
         // Commande supprimée de la base de données
@@ -1052,7 +1052,7 @@ const TabletInterface = ({ etablissementId }) => {
   // NOTIFICATIONS SONORES
   // ============================================
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [lastOrderCount, setLastOrderCount] = useState(0);
+  const lastOrderCountRef = useRef(-1); // -1 = pas encore initialisé
   const audioContextRef = useRef(null);
 
   // Initialiser l'audio au premier clic
@@ -1196,21 +1196,27 @@ const TabletInterface = ({ etablissementId }) => {
 
       // Détecter nouvelles commandes et jouer le son
       const currentPendingCount = ordersData.filter(o => o.status === 'pending').length;
-      if (currentPendingCount > lastOrderCount && lastOrderCount > 0) {
+
+      // Si c'est la première fois (-1), on initialise juste le compteur
+      if (lastOrderCountRef.current === -1) {
+        lastOrderCountRef.current = currentPendingCount;
+      } else if (currentPendingCount > lastOrderCountRef.current) {
         // Nouvelle commande détectée !
         if (currentPendingCount > 10) {
           playAlertSound(); // Son d'alerte si surcharge
         } else {
           playNotificationSound(); // Son normal
         }
+        lastOrderCountRef.current = currentPendingCount;
+      } else {
+        lastOrderCountRef.current = currentPendingCount;
       }
-      setLastOrderCount(currentPendingCount);
 
       setOrders(ordersData);
     });
 
     return () => unsubscribe();
-  }, [etablissementId, lastOrderCount, playNotificationSound, playAlertSound]);
+  }, [etablissementId, playNotificationSound, playAlertSound]);
 
   const markAsInPreparation = async (orderId) => {
     try {
