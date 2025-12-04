@@ -153,8 +153,8 @@ const StripePayment = ({
 
         const result = await createPaymentIntent({
           etablissementId,
-          amount: Math.round(total * 100), // Convertir en centimes
-          currency: 'eur',
+          amount: Math.round(total * 100), // Convertir en cents
+          currency: 'cad',
           orderData
         });
 
@@ -255,7 +255,7 @@ const StripePayment = ({
             {t?.payment || 'Paiement'}
           </h2>
           <p className="text-3xl font-bold" style={{ color: '#00FF41' }}>
-            {total.toFixed(2)} €
+            ${total.toFixed(2)} CAD
           </p>
         </div>
 
@@ -271,7 +271,7 @@ const StripePayment = ({
                   {item.quantity}x {item.name}
                 </span>
                 <span className="text-gray-400">
-                  {(item.price * item.quantity).toFixed(2)} €
+                  ${(item.price * item.quantity).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -279,7 +279,7 @@ const StripePayment = ({
           {orderData.tip > 0 && (
             <div className="flex justify-between text-sm mt-2 pt-2 border-t border-gray-700">
               <span className="text-white">{t?.tip || 'Pourboire'}</span>
-              <span className="text-gray-400">{orderData.tip.toFixed(2)} €</span>
+              <span className="text-gray-400">${orderData.tip.toFixed(2)}</span>
             </div>
           )}
         </div>

@@ -446,7 +446,7 @@ async function getStripeInstance(etablissementId) {
 // ============================================
 exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
   try {
-    const { etablissementId, amount, currency = 'eur', orderData } = data;
+    const { etablissementId, amount, currency = 'cad', orderData } = data;
 
     // Validation des paramètres
     if (!etablissementId || typeof etablissementId !== 'string') {
