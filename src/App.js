@@ -463,10 +463,12 @@ const ClientInterface = ({ etablissementId }) => {
           setShowCart(true);
         }
 
-        // Si la commande est livrée/retirée, réinitialiser l'état du client
+        // Si la commande est livrée/retirée, rester sur l'écran "Commande prête" puis retour au menu
         if (orderData.status === 'delivered') {
-          console.log('Commande retirée, réinitialisation...');
-          // Attendre 2 secondes pour que l'utilisateur voie le statut final
+          console.log('Commande livrée, retour au menu dans 2s...');
+          // Garder showCart: true pour rester sur l'écran "Commande prête"
+          // Ne pas mettre à jour currentOrder pour garder status='ready' visuellement
+          // Après 2 secondes, reset complet vers le menu
           setTimeout(() => {
             localStorage.removeItem(`currentOrderNumber_${etablissementId}`);
             localStorage.removeItem(`currentOrderId_${etablissementId}`);
@@ -477,6 +479,7 @@ const ClientInterface = ({ etablissementId }) => {
             setShowCart(false);
             setQuantities({});
           }, 2000);
+          return; // Ne pas mettre à jour currentOrder avec status='delivered'
         }
       } else {
         // Commande supprimée de la base de données
