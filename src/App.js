@@ -457,17 +457,13 @@ const ClientInterface = ({ etablissementId }) => {
     const unsubscribe = onSnapshot(orderRef, (docSnap) => {
       if (docSnap.exists()) {
         const orderData = { id: docSnap.id, ...docSnap.data() };
-        setCurrentOrder(orderData);
 
-        if (orderData.status === 'ready') {
-          setShowCart(true);
-        }
-
-        // Si la commande est livrée/retirée, rester sur l'écran "Commande prête" puis retour au menu
+        // Si la commande est livrée, rester sur l'écran "Commande prête" puis retour au menu
         if (orderData.status === 'delivered') {
           console.log('Commande livrée, retour au menu dans 2s...');
-          // Garder showCart: true pour rester sur l'écran "Commande prête"
-          // Ne pas mettre à jour currentOrder pour garder status='ready' visuellement
+          // Forcer l'affichage "Commande prête" en gardant status='ready'
+          setCurrentOrder(prev => prev ? { ...prev, status: 'ready' } : prev);
+          setShowCart(true);
           // Après 2 secondes, reset complet vers le menu
           setTimeout(() => {
             localStorage.removeItem(`currentOrderNumber_${etablissementId}`);
@@ -479,7 +475,14 @@ const ClientInterface = ({ etablissementId }) => {
             setShowCart(false);
             setQuantities({});
           }, 2000);
-          return; // Ne pas mettre à jour currentOrder avec status='delivered'
+          return;
+        }
+
+        // Mise à jour normale pour les autres statuts
+        setCurrentOrder(orderData);
+
+        if (orderData.status === 'ready') {
+          setShowCart(true);
         }
       } else {
         // Commande supprimée de la base de données
