@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ShoppingCart, Check } from 'lucide-react';
 import { collection, onSnapshot, query, orderBy, addDoc, updateDoc, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
@@ -14,6 +14,7 @@ import UsersManager from './components/UsersManager';
 import ShowUID from './components/ShowUID';
 import LanguageSelector from './components/LanguageSelector';
 import ClubRegistrationForm from './components/ClubRegistrationForm';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Wrapper pour la logique principale avec auth
 const RestaurantOrderSystemWithAuth = () => {
@@ -268,16 +269,18 @@ const RestaurantOrderSystemWithAuth = () => {
   return <ClientInterface etablissementId={etablissementId} />;
 };
 
-// Composant principal avec AuthProvider
+// Composant principal avec AuthProvider et ErrorBoundary
 const RestaurantOrderSystem = () => {
   return (
-    <AuthProvider>
-      <RoleProvider>
-        <LanguageProvider>
-          <RestaurantOrderSystemWithAuth />
-        </LanguageProvider>
-      </RoleProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <RoleProvider>
+          <LanguageProvider>
+            <RestaurantOrderSystemWithAuth />
+          </LanguageProvider>
+        </RoleProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 
@@ -1045,6 +1048,81 @@ const TabletInterface = ({ etablissementId }) => {
   // ============================================
   const [ordersOpen, setOrdersOpen] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  // ============================================
+  // NOTIFICATIONS SONORES
+  // ============================================
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [lastOrderCount, setLastOrderCount] = useState(0);
+  const audioContextRef = useRef(null);
+
+  // Initialiser l'audio au premier clic
+  const initAudio = useCallback(() => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioContextRef.current;
+  }, []);
+
+  // Jouer le son de notification
+  const playNotificationSound = useCallback(() => {
+    if (!soundEnabled) return;
+    try {
+      const audioContext = initAudio();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      const currentTime = audioContext.currentTime;
+      // Premier ton
+      const osc1 = audioContext.createOscillator();
+      const gain1 = audioContext.createGain();
+      osc1.connect(gain1);
+      gain1.connect(audioContext.destination);
+      osc1.frequency.setValueAtTime(880, currentTime);
+      osc1.type = 'sine';
+      gain1.gain.setValueAtTime(0.3, currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.3);
+      osc1.start(currentTime);
+      osc1.stop(currentTime + 0.3);
+      // Deuxième ton
+      const osc2 = audioContext.createOscillator();
+      const gain2 = audioContext.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioContext.destination);
+      osc2.frequency.setValueAtTime(1318.5, currentTime + 0.15);
+      osc2.type = 'sine';
+      gain2.gain.setValueAtTime(0, currentTime);
+      gain2.gain.setValueAtTime(0.3, currentTime + 0.15);
+      gain2.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.5);
+      osc2.start(currentTime + 0.15);
+      osc2.stop(currentTime + 0.5);
+    } catch (e) { console.warn('Son non supporté:', e); }
+  }, [soundEnabled, initAudio]);
+
+  // Jouer son d'alerte (surcharge)
+  const playAlertSound = useCallback(() => {
+    if (!soundEnabled) return;
+    try {
+      const audioContext = initAudio();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      const currentTime = audioContext.currentTime;
+      for (let i = 0; i < 3; i++) {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.frequency.setValueAtTime(1000, currentTime + i * 0.2);
+        osc.type = 'square';
+        gain.gain.setValueAtTime(0.2, currentTime + i * 0.2);
+        gain.gain.exponentialRampToValueAtTime(0.01, currentTime + i * 0.2 + 0.1);
+        osc.start(currentTime + i * 0.2);
+        osc.stop(currentTime + i * 0.2 + 0.1);
+      }
+    } catch (e) { console.warn('Son non supporté:', e); }
+  }, [soundEnabled, initAudio]);
+
+  // Charger préférence son
+  useEffect(() => {
+    const saved = localStorage.getItem('quickbar_sound_enabled');
+    if (saved !== null) setSoundEnabled(saved === 'true');
+  }, []);
 
   const handleLogout = async () => {
     if (window.confirm('Voulez-vous vous déconnecter ?')) {
@@ -1115,11 +1193,24 @@ const TabletInterface = ({ etablissementId }) => {
         ...doc.data(),
         timestamp: doc.data().timestamp || new Date().toISOString()
       }));
+
+      // Détecter nouvelles commandes et jouer le son
+      const currentPendingCount = ordersData.filter(o => o.status === 'pending').length;
+      if (currentPendingCount > lastOrderCount && lastOrderCount > 0) {
+        // Nouvelle commande détectée !
+        if (currentPendingCount > 10) {
+          playAlertSound(); // Son d'alerte si surcharge
+        } else {
+          playNotificationSound(); // Son normal
+        }
+      }
+      setLastOrderCount(currentPendingCount);
+
       setOrders(ordersData);
     });
 
     return () => unsubscribe();
-  }, [etablissementId]);
+  }, [etablissementId, lastOrderCount, playNotificationSound, playAlertSound]);
 
   const markAsInPreparation = async (orderId) => {
     try {
@@ -1222,14 +1313,34 @@ const TabletInterface = ({ etablissementId }) => {
               <p className="text-xs sm:text-sm text-gray-400 italic">serveur</p>
             )}
           </div>
-          {/* Logout button */}
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-all shadow-lg"
-            title="Se déconnecter"
-          >
-            Déconnexion
-          </button>
+          <div className="flex gap-2">
+            {/* Sound toggle button */}
+            <button
+              onClick={() => {
+                initAudio(); // Activer l'audio au premier clic
+                const newValue = !soundEnabled;
+                setSoundEnabled(newValue);
+                localStorage.setItem('quickbar_sound_enabled', newValue ? 'true' : 'false');
+                if (newValue) playNotificationSound(); // Test du son
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all shadow-lg ${
+                soundEnabled
+                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                  : 'bg-gray-600 hover:bg-gray-500 text-gray-300'
+              }`}
+              title={soundEnabled ? 'Son activé' : 'Son désactivé'}
+            >
+              {soundEnabled ? '🔊 Son' : '🔇 Muet'}
+            </button>
+            {/* Logout button */}
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-all shadow-lg"
+              title="Se déconnecter"
+            >
+              Déconnexion
+            </button>
+          </div>
         </div>
 
         <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl">

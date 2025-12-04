@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "QuickBar",
+  "name": "QuickBar - Commande Digitale",
+  "description": "Système de commande digitale pour bars et clubs",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,16 +11,32 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#000000",
+  "scope": "/",
+  "categories": ["business", "food", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Admin",
+      "short_name": "Admin",
+      "description": "Accéder à l'administration",
+      "url": "/admin",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
 }

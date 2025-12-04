@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBar - Révolutionnez l'expérience de votre club</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        function openContactModal() {
+            document.getElementById('contactModal').style.display = 'flex';
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').style.display = 'none';
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // Récupération des données du formulaire
+            const formData = new FormData(event.target);
+            const data = {
+                nom: formData.get('nom'),
+                etablissement: formData.get('etablissement'),
+                telephone: formData.get('telephone'),
+                email: formData.get('email'),
+                moment: formData.get('moment')
+            };
+            
+            // Construction du mailto avec les données
+            const subject = 'Demande de démo QuickBar - ' + data.etablissement;
+            const body = `Nouvelle demande de démo QuickBar\n\nNom: ${data.nom}\nÉtablissement: ${data.etablissement}\nTéléphone: ${data.telephone}\nEmail: ${data.email}\nMeilleur moment pour contact: ${data.moment}`;
+            
+            window.location.href = `mailto:youngleader@outlook.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Message de confirmation
+            alert('Merci pour votre intérêt! Nous vous contacterons très bientôt pour planifier votre démo.');
+            closeContactModal();
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .slide {
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            display: none;
+            padding: 40px 60px 80px 60px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 2px solid #00ff41;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.3);
+            animation: slideIn 0.5s ease;
+            position: relative;
+        }
+        
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        h1 {
+            font-size: 3em;
+            color: #00ff41;
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: 0;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            font-weight: bold;
+            line-height: 1.2;
+            padding: 0 20px;
+        }
+        
+        h2 {
+            font-size: 2.2em;
+            color: #00ff41;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.2;
+            padding: 0 20px;
+        }
+        
+        h3 {
+            font-size: 1.8em;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .subtitle {
+            font-size: 1.5em;
+            color: #ccc;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .point {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(0, 255, 65, 0.05);
+            border-left: 4px solid #00ff41;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .point:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateX(10px);
+        }
+        
+        .icon {
+            font-size: 2em;
+            color: #00ff41;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .point-text {
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: #00ff41;
+            font-weight: bold;
+        }
+        
+        .steps-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 255, 65, 0.05);
+            border-radius: 15px;
+            border: 2px solid #00ff41;
+            transition: all 0.3s;
+        }
+        
+        .step:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
+        }
+        
+        .step-number {
+            font-size: 3em;
+            color: #00ff41;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .step-title {
+            font-size: 1.5em;
+            color: #00ff41;
+            margin-bottom: 15px;
+        }
+        
+        .step-desc {
+            font-size: 1.1em;
+            color: #ccc;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 20px 50px;
+            background: #00ff41;
+            color: #000;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            margin-top: 40px;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+        }
+        
+        .cta-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.8);
+        }
+        
+        .navigation {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            padding: 15px 30px;
+            background: rgba(0, 255, 65, 0.2);
+            color: #00ff41;
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: #00ff41;
+            color: #000;
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #00ff41;
+            font-size: 1.2em;
+        }
+        
+        .mockup-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .phone-mockup {
+            width: 240px;
+            height: 480px;
+            background: #111;
+            border: 6px solid #333;
+            border-radius: 30px;
+            padding: 10px;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.3);
+        }
+        
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            border: 1px solid #00ff41;
+            overflow-y: auto;
+            font-size: 0.7em;
+        }
+        
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .benefit-card {
+            padding: 25px;
+            background: rgba(0, 255, 65, 0.05);
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+        }
+        
+        .contact-info {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .contact-info p {
+            font-size: 1.3em;
+            margin: 15px 0;
+            color: #ccc;
+        }
+        
+        .contact-info .email {
+            color: #00ff41;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Titre -->
+        <div class="slide active">
+            <div class="slide-number">1/11</div>
+            <h1>Révolutionnez l'expérience de votre club</h1>
+            <h3 class="subtitle">Augmentez vos revenus et servez plus vite avec <span class="highlight">QuickBar</span></h3>
+            <div class="mockup-container">
+                <div class="phone-mockup">
+                    <div class="phone-screen" style="overflow: hidden; padding: 0;">
+                        <!-- Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #333;">
+                            <span style="border: 1px solid #00ff41; padding: 3px 8px; color: #00ff41; font-size: 0.8em;">← RETOUR</span>
+                            <span style="color: #00ff41; font-weight: bold; font-size: 0.9em;">PANIER</span>
+                            <span style="color: #00ff41; font-size: 0.8em;">23:48</span>
+                        </div>
+                        
+                        <!-- Table Number -->
+                        <div style="text-align: center; padding: 10px; border-bottom: 1px solid #333;">
+                            <div style="color: #ffcc00; font-size: 0.9em;">TABLE 12</div>
+                        </div>
+                        
+                        <!-- Votre Commande -->
+                        <div style="text-align: center; padding: 10px;">
+                            <div style="color: #00ff41; font-size: 0.9em; font-weight: bold;">VOTRE COMMANDE</div>
+                        </div>
+                        
+                        <!-- Mojito Royal Item -->
+                        <div style="background: rgba(255,255,255,0.03); margin: 0 10px; padding: 10px; border: 1px solid #333;">
+                            <div style="color: #00ff41; font-weight: bold; font-size: 0.85em;">MOJITO ROYAL</div>
+                            <div style="color: #888; font-size: 0.7em;">Rhum premium, menthe fraîche</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                <div style="color: #00ff41; font-size: 0.75em;">12.50$ l'unité</div>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <span style="border: 1px solid #333; padding: 2px 6px; color: #888; font-size: 0.8em;">−</span>
+                                    <span style="color: #00ff41; font-size: 0.9em;">1</span>
+                                    <span style="border: 1px solid #333; padding: 2px 6px; color: #888; font-size: 0.8em;">+</span>
+                                </div>
+                                <div style="color: #00ff41; font-weight: bold; font-size: 0.85em;">12.50$</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Totals -->
+                        <div style="background: rgba(255,255,255,0.03); margin: 10px; padding: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="color: #888; font-size: 0.75em;">Sous-total (1 article)</span>
+                                <span style="color: #00ff41; font-size: 0.75em;">12.50$</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="color: #888; font-size: 0.75em;">Service</span>
+                                <span style="color: #00ff41; font-size: 0.75em;">Inclus</span>
+                            </div>
+                            <div style="border-top: 1px solid #333; padding-top: 8px; display: flex; justify-content: space-between; font-weight: bold;">
+                                <span style="color: #00ff41; font-size: 0.95em;">TOTAL</span>
+                                <span style="color: #00ff41; font-size: 0.95em;">12.50$</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Continue Button -->
+                        <div style="margin: 0 10px;">
+                            <div style="background: rgba(0,255,65,0.1); border: 1px solid #00ff41; text-align: center; padding: 8px; color: #00ff41; font-weight: bold; font-size: 0.8em;">
+                                CONTINUER MES ACHATS
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Methods -->
+                        <div style="display: flex; gap: 5px; margin: 8px 10px; justify-content: space-between;">
+                            <div style="flex: 1; border: 1px solid #333; padding: 6px; text-align: center; color: #888; font-size: 0.7em;">APPLE PAY</div>
+                            <div style="flex: 1; border: 1px solid #333; padding: 6px; text-align: center; color: #888; font-size: 0.7em;">GOOGLE PAY</div>
+                            <div style="flex: 1; border: 1px solid #333; padding: 6px; text-align: center; color: #888; font-size: 0.7em;">CARTE</div>
+                        </div>
+                        
+                        <!-- Apple Pay Button -->
+                        <div style="margin: 0 10px 10px;">
+                            <div style="background: #00ff41; color: #000; text-align: center; padding: 10px; font-weight: bold; font-size: 0.9em;">
+                                APPLE PAY - 12.50$
+                            </div>
+                        </div>
+                        
+                        <!-- Footer text -->
+                        <div style="text-align: center; padding: 8px; font-size: 0.6em; color: #666;">
+                            Paiement sécurisé • Notification SMS<br>
+                            Récupération au bar avec votre numéro<br>
+                            Temps de préparation: 10-15 min
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center; color: #00ff41; font-size: 1.3em; margin: 20px 0 0 0; letter-spacing: 2px;">
+                Commandez • Payez • Récupérez
+            </p>
+        </div>
+
+        <!-- Slide 2: Le Problème -->
+        <div class="slide">
+            <div class="slide-number">2/11</div>
+            <h2>Le bar : un goulot d'étranglement les soirs de pointe</h2>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">😤</span>
+                    <div class="point-text"><span class="highlight">Longues files d'attente = Clients frustrés.</span><br>Un client qui attend est un client qui ne danse pas et ne consomme pas.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">💸</span>
+                    <div class="point-text"><span class="highlight">Ventes manquées.</span><br>Combien de verres ne sont jamais commandés à cause de la file d'attente ?</div>
+                </div>
+                <div class="point">
+                    <span class="icon">😰</span>
+                    <div class="point-text"><span class="highlight">Personnel sous pression.</span><br>Risque d'erreurs dans les commandes et le paiement à cause du bruit et du stress.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🐢</span>
+                    <div class="point-text"><span class="highlight">Paiements lents.</span><br>La gestion de l'argent comptant et des terminaux de paiement ralentit le service.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Notre Solution -->
+        <div class="slide">
+            <div class="slide-number">3/11</div>
+            <h2>QuickBar : La commande au bout des doigts</h2>
+            <p class="subtitle">Offrez à vos clients la liberté de commander quand ils le veulent, d'où ils veulent dans votre établissement.</p>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">✨</span>
+                    <div class="point-text"><span class="highlight">Simple :</span> Scan d'un code QR sur la table. Pas de téléchargement d'application.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">⚡</span>
+                    <div class="point-text"><span class="highlight">Rapide :</span> Commande et paiement en quelques secondes.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🔔</span>
+                    <div class="point-text"><span class="highlight">Efficace :</span> Notification instantanée quand la boisson est prête.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Comment ça marche (Client) -->
+        <div class="slide">
+            <div class="slide-number">4/11</div>
+            <h2>L'expérience client, réinventée en 3 étapes</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">SCANNE</div>
+                    <div class="step-desc">Le client scanne le code QR présent sur sa table ou au bar</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">COMMANDE</div>
+                    <div class="step-desc">Il parcourt votre menu digital, choisit ses boissons et paie de façon sécurisée</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">RÉCUPÈRE</div>
+                    <div class="step-desc">Il reçoit une notification "Commande prête!" et se rend au point de récupération</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Comment ça marche (Bar) -->
+        <div class="slide">
+            <div class="slide-number">5/11</div>
+            <h2>Un outil simple pour un service optimisé</h2>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">📱</span>
+                    <div class="point-text">Les barmans reçoivent les commandes en temps réel sur une tablette</div>
+                </div>
+                <div class="point">
+                    <span class="icon">✅</span>
+                    <div class="point-text">Les commandes sont claires, détaillées et déjà payées. Plus d'erreurs.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🍹</span>
+                    <div class="point-text">Ils préparent les boissons et cliquent sur "Prêt" pour notifier le client</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🚀</span>
+                    <div class="point-text">Le flux de travail est plus fluide, moins de stress, plus d'efficacité</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Bénéfices -->
+        <div class="slide">
+            <div class="slide-number">6/11</div>
+            <h2>Plus de revenus, moins de problèmes</h2>
+            <div class="benefit-grid">
+                <div class="benefit-card">
+                    <span class="icon">📈</span>
+                    <h3 style="color: #00ff41; text-align: left; font-size: 1.5em;">Augmentation du panier moyen</h3>
+                    <p>Facilite les commandes impulsives et les "deuxièmes tournées"</p>
+                </div>
+                <div class="benefit-card">
+                    <span class="icon">⚙️</span>
+                    <h3 style="color: #00ff41; text-align: left; font-size: 1.5em;">Efficacité opérationnelle</h3>
+                    <p>Réduit la pression sur le personnel, diminue les erreurs de commande</p>
+                </div>
+                <div class="benefit-card">
+                    <span class="icon">🚀</span>
+                    <h3 style="color: #00ff41; text-align: left; font-size: 1.5em;">Rotation plus rapide</h3>
+                    <p>Servez plus de clients en moins de temps lors des pics d'affluence</p>
+                </div>
+                <div class="benefit-card">
+                    <span class="icon">📊</span>
+                    <h3 style="color: #00ff41; text-align: left; font-size: 1.5em;">Données stratégiques</h3>
+                    <p>Comprenez les habitudes de consommation pour optimiser votre menu</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Solution aux défis -->
+        <div class="slide">
+            <div class="slide-number">7/11</div>
+            <h2>Nous avons pensé à tout</h2>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">📍</span>
+                    <div class="point-text"><span class="highlight">Point de récupération :</span> Nous vous aidons à mettre en place un point de collecte "Express" efficace pour ne pas créer un nouvel embouteillage.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🔐</span>
+                    <div class="point-text"><span class="highlight">Vérification sécurisée :</span> Le client présente un QR code de commande unique (#T12-4728). Pas de vol ni d'erreur.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">👮</span>
+                    <div class="point-text"><span class="highlight">Service responsable :</span> Votre personnel garde le contrôle final et valide visuellement l'état du client, garantissant le respect de la loi.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Intégration -->
+        <div class="slide">
+            <div class="slide-number">8/11</div>
+            <h2>Opérationnel en moins d'une semaine</h2>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">💰</span>
+                    <div class="point-text"><span class="highlight">Aucun matériel coûteux :</span> Une simple tablette et une connexion Wi-Fi suffisent</div>
+                </div>
+                <div class="point">
+                    <span class="icon">📋</span>
+                    <div class="point-text"><span class="highlight">Création de votre menu digital :</span> Nous nous occupons de tout configurer pour vous</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🎓</span>
+                    <div class="point-text"><span class="highlight">Formation de votre équipe :</span> Une prise en main simple et rapide de l'outil</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🛠️</span>
+                    <div class="point-text"><span class="highlight">Support technique local :</span> Une équipe pour vous accompagner</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Offre -->
+        <div class="slide">
+            <div class="slide-number">9/11</div>
+            <h2>Un modèle gagnant-gagnant</h2>
+            <p class="subtitle">Choisissez le modèle qui vous convient. Nous réussissons si vous réussissez.</p>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">💳</span>
+                    <div class="point-text"><span class="highlight">Option A : Modèle par abonnement</span><br>Un frais mensuel fixe pour un nombre de commandes illimité</div>
+                </div>
+                <div class="point">
+                    <span class="icon">💰</span>
+                    <div class="point-text"><span class="highlight">Option B : Modèle à la commission</span><br>Un faible pourcentage prélevé sur chaque commande effectuée via l'application</div>
+                </div>
+                <div class="point" style="background: rgba(0, 255, 65, 0.2);">
+                    <span class="icon">🎁</span>
+                    <div class="point-text"><span class="highlight">Offre de lancement spéciale :</span><br>Projet pilote GRATUIT pour votre prochain grand événement!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Prochaines étapes -->
+        <div class="slide">
+            <div class="slide-number">10/11</div>
+            <h2>Prêts à transformer votre service ?</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-desc">Planifions une démonstration en direct de 15 minutes</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-desc">Discutons d'un projet pilote gratuit pour votre prochain grand événement</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-desc">Devenez le club le plus innovant</div>
+                </div>
+            </div>
+            <center>
+                <button class="cta-button" onclick="openContactModal()">Réservez votre démo gratuite</button>
+            </center>
+        </div>
+
+        <!-- Slide 11: Contact -->
+        <div class="slide">
+            <div class="slide-number">11/11</div>
+            <h2>Questions ?</h2>
+            <div class="contact-info">
+                <h3>Contactez-nous dès aujourd'hui</h3>
+                <p>📱 Téléphone : +1 819 580 9615</p>
+                <p>✉️ Email : <a href="mailto:youngleader@outlook.fr" class="email">youngleader@outlook.fr</a></p>
+                <p style="margin-top: 40px; color: #00ff41; font-size: 1.5em;">Transformons ensemble l'expérience de vos clients</p>
+            </div>
+        </div>
+
+        <!-- Modal de contact -->
+        <div id="contactModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center;">
+            <div style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 2px solid #00ff41; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; position: relative; box-shadow: 0 0 50px rgba(0, 255, 65, 0.5);">
+                <button onclick="closeContactModal()" style="position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 5px 10px; cursor: pointer; font-size: 1.2em;">✕</button>
+                
+                <h3 style="color: #00ff41; text-align: center; margin-bottom: 30px; font-size: 2em;">Réservez votre démo gratuite</h3>
+                
+                <form id="contactForm" onsubmit="handleFormSubmit(event)">
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Nom complet *</label>
+                        <input type="text" name="nom" required style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Nom de l'établissement *</label>
+                        <input type="text" name="etablissement" required style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Téléphone *</label>
+                        <input type="tel" name="telephone" required style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Email *</label>
+                        <input type="email" name="email" required style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Meilleur moment pour vous contacter</label>
+                        <select name="moment" style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                            <option value="matin" style="background: #1a1a1a;">Matin (9h-12h)</option>
+                            <option value="apres-midi" style="background: #1a1a1a;">Après-midi (12h-17h)</option>
+                            <option value="soir" style="background: #1a1a1a;">Soir (17h-21h)</option>
+                            <option value="nimporte" style="background: #1a1a1a;">N'importe quand</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" style="width: 100%; padding: 15px; background: #00ff41; color: #000; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s;">
+                        Envoyer ma demande
+                    </button>
+                </form>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; text-align: center;">
+                    <p style="color: #ccc; margin-bottom: 15px;">Ou contactez-nous directement :</p>
+                    <a href="https://wa.me/18195809615?text=Bonjour,%20j'aimerais%20planifier%20une%20démo%20de%20QuickBar%20pour%20mon%20établissement" 
+                       target="_blank" 
+                       style="display: inline-block; background: #25D366; color: white; padding: 12px 30px; border-radius: 30px; text-decoration: none; font-weight: bold; transition: all 0.3s;">
+                        💬 WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-btn" onclick="previousSlide()">← Précédent</button>
+            <button class="nav-btn" onclick="nextSlide()">Suivant →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function showSlide(n) {
+            const slides = document.getElementsByClassName('slide');
+            
+            if (n > totalSlides) {
+                currentSlide = 1;
+            }
+            if (n < 1) {
+                currentSlide = totalSlides;
+            }
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            
+            slides[currentSlide - 1].classList.add('active');
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + 50) {
+                previousSlide();
+            }
+        }
+    </script>
+</body>
+</html>

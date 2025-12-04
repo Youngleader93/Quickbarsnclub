@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBar - Revolutionize Your Club Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        function openContactModal() {
+            document.getElementById('contactModal').style.display = 'flex';
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').style.display = 'none';
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(event.target);
+            const data = {
+                nom: formData.get('nom'),
+                etablissement: formData.get('etablissement'),
+                telephone: formData.get('telephone'),
+                email: formData.get('email'),
+                moment: formData.get('moment')
+            };
+            
+            // Build mailto with data
+            const subject = 'QuickBar Demo Request - ' + data.etablissement;
+            const body = `New QuickBar demo request\n\nName: ${data.nom}\nVenue: ${data.etablissement}\nPhone: ${data.telephone}\nEmail: ${data.email}\nBest time to contact: ${data.moment}`;
+            
+            window.location.href = `mailto:youngleader@outlook.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Confirmation message
+            alert('Thank you for your interest! We will contact you very soon to schedule your demo.');
+            closeContactModal();
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .slide {
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            display: none;
+            padding: 40px 60px 80px 60px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 2px solid #00ff41;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.3);
+            animation: slideIn 0.5s ease;
+            position: relative;
+        }
+        
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        h1 {
+            font-size: 3em;
+            color: #00ff41;
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: 0;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            font-weight: bold;
+            line-height: 1.2;
+            padding: 0 20px;
+        }
+        
+        h2 {
+            font-size: 2.2em;
+            color: #00ff41;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.2;
+            padding: 0 20px;
+        }
+        
+        h3 {
+            font-size: 1.8em;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .subtitle {
+            font-size: 1.5em;
+            color: #ccc;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .point {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(0, 255, 65, 0.05);
+            border-left: 4px solid #00ff41;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .point:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateX(10px);
+        }
+        
+        .icon {
+            font-size: 2em;
+            color: #00ff41;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .point-text {
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: #00ff41;
+            font-weight: bold;
+        }
+        
+        .steps-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 255, 65, 0.05);
+            border-radius: 15px;
+            border: 2px solid #00ff41;
+            transition: all 0.3s;
+        }
+        
+        .step:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
+        }
+        
+        .step-number {
+            font-size: 3em;
+            color: #00ff41;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .step-title {
+            font-size: 1.5em;
+            color: #00ff41;
+            margin-bottom: 15px;
+        }
+        
+        .step-desc {
+            font-size: 1.1em;
+            color: #ccc;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 20px 50px;
+            background: #00ff41;
+            color: #000;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            margin-top: 40px;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+        }
+        
+        .cta-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.8);
+        }
+        
+        .navigation {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            padding: 15px 30px;
+            background: rgba(0, 255, 65, 0.2);
+            color: #00ff41;
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: #00ff41;
+            color: #000;
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #00ff41;
+            font-size: 1.2em;
+        }
+        
+        .mockup-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .phone-mockup {
+            width: 240px;
+            height: 480px;
+            background: #111;
+            border: 6px solid #333;
+            border-radius: 30px;
+            padding: 10px;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.3);
+        }
+        
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            border: 1px solid #00ff41;
+            overflow-y: auto;
+            font-size: 0.7em;
+        }
+        
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .benefit-card {
+            padding: 25px;
+            background: rgba(0, 255, 65, 0.05);
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+        }
+        
+        .contact-info {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .contact-info p {
+            font-size: 1.3em;
+            margin: 15px 0;
+            color: #ccc;
+        }
+        
+        .contact-info .email {
+            color: #00ff41;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="slide-number">1/11</div>
+            <h1>Revolutionize Your Club Experience</h1>
+            <h3 class="subtitle">Boost your revenue and serve faster with <span class="highlight">QuickBar</span></h3>
+            <div class="mockup-container">
+                <div class="phone-mockup">
+                    <div class="phone-screen" style="overflow: hidden; padding: 0;">
+                        <!-- Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid #333;">
+                            <span style="border: 1px solid #00ff41; padding: 3px 8px; color: #00ff41; font-size: 0.8em;">← BACK</span>
+                            <span style="color: #00ff41; font-weight: bold; font-size: 0.9em;">CART</span>
+                            <span style="color: #00ff41; font-size: 0.8em;">11:48 PM</span>
+                        </div>
+                        
+                        <!-- Table Number -->
+                        <div style="text-align: center; padding: 10px; border-bottom: 1px solid #333;">
+                            <div style="color: #ffcc00; font-size: 0.9em;">TABLE 12</div>
+                        </div>
+                        
+                        <!-- Your Order -->
+                        <div style="text-align: center; padding: 10px;">
+                            <div style="color: #00ff41; font-size: 0.9em; font-weight: bold;">YOUR ORDER</div>
+                        </div>
+                        
+                        <!-- Mojito Royal Item -->
+                        <div style="background: rgba(255,255,255,0.03); margin: 0 10px; padding: 10px; border: 1px solid #333;">
+                            <div style="color: #00ff41; font-weight: bold; font-size: 0.85em;">MOJITO ROYAL</div>
+                            <div style="color: #888; font-size: 0.7em;">Premium rum, fresh mint</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                <div style="color: #00ff41; font-size: 0.75em;">$12.50 per unit</div>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <span style="border: 1px solid #333; padding: 2px 6px; color: #888; font-size: 0.8em;">−</span>
+                                    <span style="color: #00ff41; font-size: 0.9em;">1</span>
+                                    <span style="border: 1px solid #333; padding: 2px 6px; color: #888; font-size: 0.8em;">+</span>
+                                </div>
+                                <div style="color: #00ff41; font-weight: bold; font-size: 0.85em;">$12.50</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Totals -->
+                        <div style="background: rgba(255,255,255,0.03); margin: 10px; padding: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="color: #888; font-size: 0.75em;">Subtotal (1 item)</span>
+                                <span style="color: #00ff41; font-size: 0.75em;">$12.50</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="color: #888; font-size: 0.75em;">Service</span>
+                                <span style="color: #00ff41; font-size: 0.75em;">Included</span>
+                            </div>
+                            <div style="border-top: 1px solid #333; padding-top: 8px; display: flex; justify-content: space-between; font-weight: bold;">
+                                <span style="color: #00ff41; font-size: 0.95em;">TOTAL</span>
+                                <span style="color: #00ff41; font-size: 0.95em;">$12.50</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Continue Button -->
+                        <div style="margin: 0 10px;">
+                            <div style="background: rgba(0,255,65,0.1); border: 1px solid #00ff41; text-align: center; padding: 8px; color: #00ff41; font-weight: bold; font-size: 0.8em;">
+                                CONTINUE SHOPPING
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Methods -->
+                        <div style="display: flex; gap: 5px; margin: 8px 10px; justify-content: space-between;">
+                            <div style="flex: 1; border: 1px solid #333; padding: 6px; text-align: center; color: #888; font-size: 0.7em;">APPLE PAY</div>
+                            <div style="flex: 1; border: 1px solid #333; padding: 6px; text-align: center; color: #888; font-size: 0.7em;">GOOGLE PAY</div>
+                            <div style="flex: 1; border: 1px solid #333; padding: 6px; text-align: center; color: #888; font-size: 0.7em;">CARD</div>
+                        </div>
+                        
+                        <!-- Apple Pay Button -->
+                        <div style="margin: 0 10px 10px;">
+                            <div style="background: #00ff41; color: #000; text-align: center; padding: 10px; font-weight: bold; font-size: 0.9em;">
+                                APPLE PAY - $12.50
+                            </div>
+                        </div>
+                        
+                        <!-- Footer text -->
+                        <div style="text-align: center; padding: 8px; font-size: 0.6em; color: #666;">
+                            Secure payment • SMS notification<br>
+                            Pick up at bar with your order number<br>
+                            Preparation time: 10-15 min
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center; color: #00ff41; font-size: 1.3em; margin: 20px 0 0 0; letter-spacing: 2px;">
+                Order • Pay • Pick up
+            </p>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide">
+            <div class="slide-number">2/11</div>
+            <h2>The Bar: A Bottleneck on Peak Nights</h2>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">😤</span>
+                    <div class="point-text"><span class="highlight">Long lines = Frustrated customers.</span><br>A waiting customer is not dancing or drinking.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">💸</span>
+                    <div class="point-text"><span class="highlight">Missed sales.</span><br>How many drinks are never ordered due to wait times?</div>
+                </div>
+                <div class="point">
+                    <span class="icon">😰</span>
+                    <div class="point-text"><span class="highlight">Staff under pressure.</span><br>Risk of order and payment errors due to noise and stress.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🐢</span>
+                    <div class="point-text"><span class="highlight">Slow payments.</span><br>Cash handling and payment terminals slow down service.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Our Solution -->
+        <div class="slide">
+            <div class="slide-number">3/11</div>
+            <h2>QuickBar: Ordering at Your Fingertips</h2>
+            <p class="subtitle">Give your customers the freedom to order when they want, from anywhere in your venue.</p>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">✨</span>
+                    <div class="point-text"><span class="highlight">Simple:</span> Scan a QR code at the table. No app download required.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">⚡</span>
+                    <div class="point-text"><span class="highlight">Fast:</span> Order and pay in seconds.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🔔</span>
+                    <div class="point-text"><span class="highlight">Efficient:</span> Instant notification when drinks are ready.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: How it Works (Customer) -->
+        <div class="slide">
+            <div class="slide-number">4/11</div>
+            <h2>Customer Experience, Reimagined in 3 Steps</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">SCAN</div>
+                    <div class="step-desc">Customer scans the QR code at their table or bar</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">ORDER</div>
+                    <div class="step-desc">Browse your digital menu, select drinks and pay securely</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">PICK UP</div>
+                    <div class="step-desc">Receive "Order ready!" notification and collect at pickup point</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: How it Works (Bar) -->
+        <div class="slide">
+            <div class="slide-number">5/11</div>
+            <h2>Simple Tool for Optimized Service</h2>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">📱</span>
+                    <div class="point-text">Bartenders receive orders in real-time on a tablet</div>
+                </div>
+                <div class="point">
+                    <span class="icon">✅</span>
+                    <div class="point-text">Orders are clear, detailed and already paid. No more errors.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🍹</span>
+                    <div class="point-text">They prepare drinks and tap "Ready" to notify customers</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🚀</span>
+                    <div class="point-text">Smoother workflow, less stress, more efficiency</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Benefits -->
+        <div class="slide">
+            <div class="slide-number">6/11</div>
+            <h2>More Revenue, Fewer Problems</h2>
+            <div class="benefit-grid">
+                <div class="benefit-card">
+                    <span class="icon">📈</span>
+                    <h3 style="color: #00ff41; text-align: left; font-size: 1.5em;">Increased Average Check</h3>
+                    <p>Facilitates impulse purchases and "second rounds"</p>
+                </div>
+                <div class="benefit-card">
+                    <span class="icon">⚙️</span>
+                    <h3 style="color: #00ff41; text-align: left; font-size: 1.5em;">Operational Efficiency</h3>
+                    <p>Reduces staff pressure, decreases order errors</p>
+                </div>
+                <div class="benefit-card">
+                    <span class="icon">🚀</span>
+                    <h3 style="color: #00ff41; text-align: left; font-size: 1.5em;">Faster Turnover</h3>
+                    <p>Serve more customers in less time during peak hours</p>
+                </div>
+                <div class="benefit-card">
+                    <span class="icon">📊</span>
+                    <h3 style="color: #00ff41; text-align: left; font-size: 1.5em;">Strategic Data</h3>
+                    <p>Understand consumption patterns to optimize your menu</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Solution to Challenges -->
+        <div class="slide">
+            <div class="slide-number">7/11</div>
+            <h2>We've Thought of Everything</h2>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">📍</span>
+                    <div class="point-text"><span class="highlight">Pickup Point:</span> We help you set up an efficient "Express" collection point to avoid new bottlenecks.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🔐</span>
+                    <div class="point-text"><span class="highlight">Secure Verification:</span> Customer presents unique order QR code (#T12-4728). No theft or errors.</div>
+                </div>
+                <div class="point">
+                    <span class="icon">👮</span>
+                    <div class="point-text"><span class="highlight">Responsible Service:</span> Your staff maintains final control and visually validates customer state, ensuring legal compliance.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Integration -->
+        <div class="slide">
+            <div class="slide-number">8/11</div>
+            <h2>Operational in Less Than a Week</h2>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">💰</span>
+                    <div class="point-text"><span class="highlight">No expensive equipment:</span> Just a tablet and Wi-Fi connection</div>
+                </div>
+                <div class="point">
+                    <span class="icon">📋</span>
+                    <div class="point-text"><span class="highlight">Digital menu creation:</span> We handle all the setup for you</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🎓</span>
+                    <div class="point-text"><span class="highlight">Team training:</span> Quick and easy onboarding</div>
+                </div>
+                <div class="point">
+                    <span class="icon">🛠️</span>
+                    <div class="point-text"><span class="highlight">Local technical support:</span> A team to support you</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Offer -->
+        <div class="slide">
+            <div class="slide-number">9/11</div>
+            <h2>A Win-Win Model</h2>
+            <p class="subtitle">Choose the model that suits you. We succeed when you succeed.</p>
+            <div class="content">
+                <div class="point">
+                    <span class="icon">💳</span>
+                    <div class="point-text"><span class="highlight">Option A: Subscription Model</span><br>Fixed monthly fee for unlimited orders</div>
+                </div>
+                <div class="point">
+                    <span class="icon">💰</span>
+                    <div class="point-text"><span class="highlight">Option B: Commission Model</span><br>Small percentage on each order placed through the app</div>
+                </div>
+                <div class="point" style="background: rgba(0, 255, 65, 0.2);">
+                    <span class="icon">🎁</span>
+                    <div class="point-text"><span class="highlight">Special Launch Offer:</span><br>FREE pilot project for your next big event!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Next Steps -->
+        <div class="slide">
+            <div class="slide-number">10/11</div>
+            <h2>Ready to Transform Your Service?</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-desc">Schedule a 15-minute live demo</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-desc">Discuss a free pilot project for your next big event</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-desc">Become the most innovative club</div>
+                </div>
+            </div>
+            <center>
+                <button class="cta-button" onclick="openContactModal()">Book Your Free Demo</button>
+            </center>
+        </div>
+
+        <!-- Slide 11: Contact -->
+        <div class="slide">
+            <div class="slide-number">11/11</div>
+            <h2>Questions?</h2>
+            <div class="contact-info">
+                <h3>Contact us today</h3>
+                <p>📱 Phone: +1 819 580 9615</p>
+                <p>✉️ Email: <a href="mailto:youngleader@outlook.fr" class="email">youngleader@outlook.fr</a></p>
+                <p style="margin-top: 40px; color: #00ff41; font-size: 1.5em;">Let's transform your customers' experience together</p>
+            </div>
+        </div>
+
+        <!-- Contact Modal -->
+        <div id="contactModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center;">
+            <div style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 2px solid #00ff41; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; position: relative; box-shadow: 0 0 50px rgba(0, 255, 65, 0.5);">
+                <button onclick="closeContactModal()" style="position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid #00ff41; color: #00ff41; padding: 5px 10px; cursor: pointer; font-size: 1.2em;">✕</button>
+                
+                <h3 style="color: #00ff41; text-align: center; margin-bottom: 30px; font-size: 2em;">Book Your Free Demo</h3>
+                
+                <form id="contactForm" onsubmit="handleFormSubmit(event)">
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Full Name *</label>
+                        <input type="text" name="nom" required style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Venue Name *</label>
+                        <input type="text" name="etablissement" required style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Phone *</label>
+                        <input type="tel" name="telephone" required style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Email *</label>
+                        <input type="email" name="email" required style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <label style="color: #00ff41; display: block; margin-bottom: 8px;">Best Time to Contact You</label>
+                        <select name="moment" style="width: 100%; padding: 12px; background: rgba(0,255,65,0.1); border: 1px solid #00ff41; color: #fff; font-size: 1.1em; border-radius: 8px;">
+                            <option value="morning" style="background: #1a1a1a;">Morning (9AM-12PM)</option>
+                            <option value="afternoon" style="background: #1a1a1a;">Afternoon (12PM-5PM)</option>
+                            <option value="evening" style="background: #1a1a1a;">Evening (5PM-9PM)</option>
+                            <option value="anytime" style="background: #1a1a1a;">Anytime</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" style="width: 100%; padding: 15px; background: #00ff41; color: #000; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s;">
+                        Send Request
+                    </button>
+                </form>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; text-align: center;">
+                    <p style="color: #ccc; margin-bottom: 15px;">Or contact us directly:</p>
+                    <a href="https://wa.me/18195809615?text=Hello,%20I%20would%20like%20to%20schedule%20a%20QuickBar%20demo%20for%20my%20venue" 
+                       target="_blank" 
+                       style="display: inline-block; background: #25D366; color: white; padding: 12px 30px; border-radius: 30px; text-decoration: none; font-weight: bold; transition: all 0.3s;">
+                        💬 WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-btn" onclick="previousSlide()">← Previous</button>
+            <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function showSlide(n) {
+            const slides = document.getElementsByClassName('slide');
+            
+            if (n > totalSlides) {
+                currentSlide = 1;
+            }
+            if (n < 1) {
+                currentSlide = totalSlides;
+            }
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            
+            slides[currentSlide - 1].classList.add('active');
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + 50) {
+                previousSlide();
+            }
+        }
+    </script>
+</body>
+</html>
