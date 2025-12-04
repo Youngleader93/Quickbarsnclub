@@ -453,42 +453,30 @@ const ClientInterface = ({ etablissementId }) => {
     if (!currentOrderId) return;
 
     const orderRef = doc(db, 'etablissements', etablissementId, 'commandes', currentOrderId);
-    let isDeliveredHandled = false; // Éviter les appels multiples
 
     const unsubscribe = onSnapshot(orderRef, (docSnap) => {
       if (docSnap.exists()) {
         const orderData = { id: docSnap.id, ...docSnap.data() };
 
-        // Si la commande est livrée, afficher "Commande prête" puis retour au menu
-        if (orderData.status === 'delivered' && !isDeliveredHandled) {
-          isDeliveredHandled = true;
-          console.log('Commande livrée! Affichage Commande Prête puis retour menu...');
-
-          // Forcer l'affichage de l'écran "Commande Prête"
-          setCurrentOrder({ ...orderData, status: 'ready' });
-          setShowCart(true);
-
-          // Après 2 secondes, retour au menu
-          setTimeout(() => {
-            localStorage.removeItem(`currentOrderNumber_${etablissementId}`);
-            localStorage.removeItem(`currentOrderId_${etablissementId}`);
-            setCurrentOrder(null);
-            setCurrentOrderNumber(null);
-            setCurrentOrderId(null);
-            setHasActiveOrder(false);
-            setShowCart(false);
-            setQuantities({});
-          }, 2000);
+        // Si la commande est livrée → retour direct au menu
+        if (orderData.status === 'delivered') {
+          console.log('Commande livrée! Retour au menu.');
+          localStorage.removeItem(`currentOrderNumber_${etablissementId}`);
+          localStorage.removeItem(`currentOrderId_${etablissementId}`);
+          setCurrentOrder(null);
+          setCurrentOrderNumber(null);
+          setCurrentOrderId(null);
+          setHasActiveOrder(false);
+          setShowCart(false);
+          setQuantities({});
           return;
         }
 
-        // Mise à jour normale pour pending, in_preparation, ready
-        if (orderData.status !== 'delivered') {
-          setCurrentOrder(orderData);
+        // Mise à jour normale
+        setCurrentOrder(orderData);
 
-          if (orderData.status === 'ready') {
-            setShowCart(true);
-          }
+        if (orderData.status === 'ready') {
+          setShowCart(true);
         }
       } else {
         // Commande supprimée de la base de données
