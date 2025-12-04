@@ -13,6 +13,9 @@ const admin = require('firebase-admin');
 
 admin.initializeApp();
 
+// Stripe sera initialisé dynamiquement avec la clé de chaque établissement
+let stripeInstances = new Map();
+
 const db = admin.firestore();
 
 // ============================================
@@ -408,3 +411,263 @@ exports.cleanupOldOrders = functions.pubsub
       return null;
     }
   });
+
+// ============================================
+// STRIPE: Récupérer l'instance Stripe pour un établissement
+// ============================================
+async function getStripeInstance(etablissementId) {
+  // Vérifier le cache
+  if (stripeInstances.has(etablissementId)) {
+    return stripeInstances.get(etablissementId);
+  }
+
+  // Récupérer les clés Stripe de l'établissement
+  const etablissementDoc = await db.collection('etablissements').doc(etablissementId).get();
+
+  if (!etablissementDoc.exists) {
+    throw new Error('Établissement non trouvé');
+  }
+
+  const data = etablissementDoc.data();
+
+  if (!data.stripeSecretKey) {
+    throw new Error('Stripe non configuré pour cet établissement');
+  }
+
+  // Créer l'instance Stripe
+  const stripe = require('stripe')(data.stripeSecretKey);
+  stripeInstances.set(etablissementId, stripe);
+
+  return stripe;
+}
+
+// ============================================
+// CLOUD FUNCTION: Créer un Payment Intent Stripe
+// ============================================
+exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
+  try {
+    const { etablissementId, amount, currency = 'eur', orderData } = data;
+
+    // Validation des paramètres
+    if (!etablissementId || typeof etablissementId !== 'string') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'ID établissement requis'
+      );
+    }
+
+    if (!amount || typeof amount !== 'number' || amount < 50) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Montant invalide (minimum 0.50€)'
+      );
+    }
+
+    // Vérifier que l'établissement existe et a Stripe activé
+    const etablissementRef = db.collection('etablissements').doc(etablissementId);
+    const etablissementDoc = await etablissementRef.get();
+
+    if (!etablissementDoc.exists) {
+      throw new functions.https.HttpsError(
+        'not-found',
+        'Établissement non trouvé'
+      );
+    }
+
+    const etablissementData = etablissementDoc.data();
+
+    if (!etablissementData.stripeEnabled) {
+      throw new functions.https.HttpsError(
+        'failed-precondition',
+        'Les paiements en ligne ne sont pas activés pour cet établissement'
+      );
+    }
+
+    // Récupérer l'instance Stripe
+    let stripe;
+    try {
+      stripe = await getStripeInstance(etablissementId);
+    } catch (error) {
+      console.error('Erreur Stripe:', error);
+      throw new functions.https.HttpsError(
+        'failed-precondition',
+        'Configuration Stripe invalide'
+      );
+    }
+
+    // Créer le Payment Intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount), // Stripe attend des centimes
+      currency: currency,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      metadata: {
+        etablissementId: etablissementId,
+        orderNumber: orderData?.number || 'N/A',
+        tableNumber: orderData?.tableNumber || 'N/A'
+      }
+    });
+
+    console.log(`💳 PaymentIntent créé: ${paymentIntent.id} - ${amount/100}€ pour ${etablissementId}`);
+
+    return {
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
+    };
+
+  } catch (error) {
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    console.error('❌ Erreur création PaymentIntent:', error);
+    throw new functions.https.HttpsError(
+      'internal',
+      'Erreur lors de la création du paiement'
+    );
+  }
+});
+
+// ============================================
+// CLOUD FUNCTION: Confirmer un paiement et créer la commande
+// ============================================
+exports.confirmPaymentAndCreateOrder = functions.https.onCall(async (data, context) => {
+  try {
+    const { etablissementId, paymentIntentId, orderData } = data;
+
+    // Validation
+    if (!etablissementId || !paymentIntentId || !orderData) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Données manquantes'
+      );
+    }
+
+    // Récupérer l'instance Stripe
+    const stripe = await getStripeInstance(etablissementId);
+
+    // Vérifier le statut du paiement
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.status !== 'succeeded') {
+      throw new functions.https.HttpsError(
+        'failed-precondition',
+        `Paiement non confirmé (statut: ${paymentIntent.status})`
+      );
+    }
+
+    // Vérifier que le montant correspond
+    const expectedAmount = Math.round(orderData.total * 100);
+    if (paymentIntent.amount !== expectedAmount) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Le montant du paiement ne correspond pas à la commande'
+      );
+    }
+
+    // Valider les données de la commande
+    const validationErrors = validateOrderData(orderData, etablissementId);
+    if (validationErrors.length > 0) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Données de commande invalides',
+        { errors: validationErrors }
+      );
+    }
+
+    // Créer la commande avec les informations de paiement
+    const etablissementRef = db.collection('etablissements').doc(etablissementId);
+
+    const sanitizedOrder = {
+      number: orderData.number,
+      items: orderData.items.map(item => ({
+        id: item.id || null,
+        name: String(item.name).substring(0, 100),
+        price: Number(item.price.toFixed(2)),
+        quantity: Math.min(Math.max(1, Math.floor(item.quantity)), VALIDATION.maxQuantityPerItem)
+      })),
+      subtotal: Number(orderData.subtotal.toFixed(2)),
+      tip: Number(orderData.tip.toFixed(2)),
+      total: Number(orderData.total.toFixed(2)),
+      status: 'pending',
+      timestamp: new Date().toISOString(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      // Informations de paiement
+      payment: {
+        method: 'stripe',
+        status: 'paid',
+        paymentIntentId: paymentIntentId,
+        paidAt: new Date().toISOString()
+      },
+      _meta: {
+        createdVia: 'cloud-function-stripe'
+      }
+    };
+
+    // Ajouter tableNumber si présent
+    if (orderData.tableNumber) {
+      sanitizedOrder.tableNumber = orderData.tableNumber;
+    }
+
+    const commandeRef = await etablissementRef.collection('commandes').add(sanitizedOrder);
+
+    console.log(`✅ Commande ${sanitizedOrder.number} créée avec paiement Stripe (ID: ${commandeRef.id})`);
+
+    return {
+      success: true,
+      orderId: commandeRef.id,
+      orderNumber: sanitizedOrder.number,
+      total: sanitizedOrder.total,
+      paymentStatus: 'paid'
+    };
+
+  } catch (error) {
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+
+    console.error('❌ Erreur confirmation paiement:', error);
+    throw new functions.https.HttpsError(
+      'internal',
+      'Erreur lors de la confirmation du paiement'
+    );
+  }
+});
+
+// ============================================
+// CLOUD FUNCTION: Vérifier la configuration Stripe d'un établissement
+// ============================================
+exports.checkStripeConfig = functions.https.onCall(async (data, context) => {
+  const { etablissementId } = data;
+
+  if (!etablissementId) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'ID établissement requis'
+    );
+  }
+
+  try {
+    const etablissementDoc = await db.collection('etablissements').doc(etablissementId).get();
+
+    if (!etablissementDoc.exists) {
+      return { configured: false, enabled: false };
+    }
+
+    const data = etablissementDoc.data();
+
+    return {
+      configured: !!data.stripeSecretKey,
+      enabled: data.stripeEnabled === true,
+      publicKey: data.stripePublicKey || null
+    };
+
+  } catch (error) {
+    console.error('❌ Erreur vérification Stripe:', error);
+    throw new functions.https.HttpsError(
+      'internal',
+      'Erreur lors de la vérification'
+    );
+  }
+});

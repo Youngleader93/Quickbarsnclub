@@ -3,7 +3,7 @@ import { doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs, dele
 import { db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
-import { Save, AlertCircle, Check, Clock, Wifi, MapPin, Phone, Mail, UserPlus, Trash2, Users } from 'lucide-react';
+import { Save, AlertCircle, Check, Clock, Wifi, MapPin, Phone, Mail, UserPlus, Trash2, Users, CreditCard, Eye, EyeOff } from 'lucide-react';
 
 const Settings = ({ etablissementId }) => {
   const [loading, setLoading] = useState(true);
@@ -19,6 +19,15 @@ const Settings = ({ etablissementId }) => {
     username: '',
     password: ''
   });
+
+  // Stripe configuration
+  const [stripeConfig, setStripeConfig] = useState({
+    stripePublicKey: '',
+    stripeSecretKey: '',
+    stripeEnabled: false
+  });
+  const [showSecretKey, setShowSecretKey] = useState(false);
+  const [savingStripe, setSavingStripe] = useState(false);
 
   const [settings, setSettings] = useState({
     nom: '',
@@ -54,6 +63,7 @@ const Settings = ({ etablissementId }) => {
   useEffect(() => {
     loadSettings();
     loadServers();
+    loadStripeConfig();
   }, [etablissementId]);
 
   const loadSettings = async () => {
@@ -98,6 +108,64 @@ const Settings = ({ etablissementId }) => {
       console.error('Erreur chargement serveurs:', error);
     } finally {
       setLoadingServers(false);
+    }
+  };
+
+  const loadStripeConfig = async () => {
+    try {
+      const docRef = doc(db, 'etablissements', etablissementId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setStripeConfig({
+          stripePublicKey: data.stripePublicKey || '',
+          stripeSecretKey: data.stripeSecretKey || '',
+          stripeEnabled: data.stripeEnabled || false
+        });
+      }
+    } catch (error) {
+      console.error('Erreur chargement config Stripe:', error);
+    }
+  };
+
+  const saveStripeConfig = async () => {
+    // Validation basique
+    if (stripeConfig.stripeEnabled) {
+      if (!stripeConfig.stripePublicKey || !stripeConfig.stripeSecretKey) {
+        showMessage('error', 'Veuillez remplir les deux clés Stripe pour activer les paiements');
+        return;
+      }
+
+      // Vérifier le format des clés
+      if (!stripeConfig.stripePublicKey.startsWith('pk_')) {
+        showMessage('error', 'La clé publique doit commencer par pk_test_ ou pk_live_');
+        return;
+      }
+
+      if (!stripeConfig.stripeSecretKey.startsWith('sk_')) {
+        showMessage('error', 'La clé secrète doit commencer par sk_test_ ou sk_live_');
+        return;
+      }
+    }
+
+    setSavingStripe(true);
+
+    try {
+      const docRef = doc(db, 'etablissements', etablissementId);
+      await updateDoc(docRef, {
+        stripePublicKey: stripeConfig.stripePublicKey.trim(),
+        stripeSecretKey: stripeConfig.stripeSecretKey.trim(),
+        stripeEnabled: stripeConfig.stripeEnabled,
+        stripeUpdatedAt: new Date().toISOString()
+      });
+
+      showMessage('success', 'Configuration Stripe sauvegardée');
+    } catch (error) {
+      console.error('Erreur sauvegarde Stripe:', error);
+      showMessage('error', 'Erreur lors de la sauvegarde');
+    } finally {
+      setSavingStripe(false);
     }
   };
 
@@ -519,6 +587,106 @@ const Settings = ({ etablissementId }) => {
             ⚠️ Les serveurs ont uniquement accès à la tablette et ne peuvent pas modifier les paramètres
           </p>
         </div>
+      </div>
+
+      {/* Configuration Stripe */}
+      <div className="bg-gray-900/30 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-xl">
+        <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
+          <CreditCard size={18} className="sm:w-5 sm:h-5" style={{ color: '#00FF41' }} />
+          Paiements en ligne (Stripe)
+        </h3>
+
+        {/* Toggle activation */}
+        <div className="mb-6">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={stripeConfig.stripeEnabled}
+              onChange={(e) => setStripeConfig({ ...stripeConfig, stripeEnabled: e.target.checked })}
+              className="w-5 h-5 rounded bg-gray-700 border-gray-600 text-green-500 focus:ring-green-500"
+            />
+            <span className="text-white font-medium">Activer les paiements en ligne</span>
+          </label>
+          <p className="text-xs text-gray-500 mt-2 ml-8">
+            Permet aux clients de payer leur commande par carte bancaire
+          </p>
+        </div>
+
+        {/* Clés Stripe */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">
+              Clé publique (Publishable key)
+            </label>
+            <input
+              type="text"
+              value={stripeConfig.stripePublicKey}
+              onChange={(e) => setStripeConfig({ ...stripeConfig, stripePublicKey: e.target.value })}
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base font-mono"
+              placeholder="pk_test_..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-400 mb-2">
+              Clé secrète (Secret key)
+            </label>
+            <div className="relative">
+              <input
+                type={showSecretKey ? 'text' : 'password'}
+                value={stripeConfig.stripeSecretKey}
+                onChange={(e) => setStripeConfig({ ...stripeConfig, stripeSecretKey: e.target.value })}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 backdrop-blur-sm rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm sm:text-base font-mono pr-12"
+                placeholder="sk_test_..."
+              />
+              <button
+                type="button"
+                onClick={() => setShowSecretKey(!showSecretKey)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+              >
+                {showSecretKey ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={saveStripeConfig}
+          disabled={savingStripe}
+          className="mt-4 w-full sm:w-auto px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+        >
+          <CreditCard size={16} className="sm:w-[18px] sm:h-[18px]" />
+          {savingStripe ? 'Sauvegarde...' : 'Sauvegarder la configuration Stripe'}
+        </button>
+
+        {/* Instructions */}
+        <div className="mt-4 p-3 bg-purple-500/10 rounded-xl space-y-2">
+          <p className="text-xs sm:text-sm text-purple-400 font-medium">
+            📋 Comment obtenir vos clés Stripe :
+          </p>
+          <ol className="text-xs sm:text-sm text-purple-400 list-decimal list-inside space-y-1">
+            <li>Créez un compte sur <span className="font-mono">stripe.com</span></li>
+            <li>Allez dans Developers → API keys</li>
+            <li>Copiez vos clés (utilisez les clés test pour tester)</li>
+            <li>Pour la production, complétez la vérification de votre compte</li>
+          </ol>
+        </div>
+
+        <div className="mt-3 p-3 bg-yellow-500/10 rounded-xl">
+          <p className="text-xs sm:text-sm text-yellow-400">
+            ⚠️ <strong>Important :</strong> La vente d'alcool nécessite les licences appropriées.
+            Le compte Stripe doit être au nom de l'établissement détenteur de la licence.
+          </p>
+        </div>
+
+        {stripeConfig.stripeEnabled && stripeConfig.stripePublicKey && (
+          <div className="mt-3 p-3 bg-green-500/10 rounded-xl flex items-center gap-2">
+            <Check size={18} style={{ color: '#00FF41' }} />
+            <p className="text-xs sm:text-sm" style={{ color: '#00FF41' }}>
+              Paiements en ligne activés - Les clients peuvent payer par carte
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

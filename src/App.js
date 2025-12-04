@@ -15,6 +15,7 @@ import ShowUID from './components/ShowUID';
 import LanguageSelector from './components/LanguageSelector';
 import ClubRegistrationForm from './components/ClubRegistrationForm';
 import ErrorBoundary from './components/ErrorBoundary';
+import StripePayment from './components/StripePayment';
 
 // Wrapper pour la logique principale avec auth
 const RestaurantOrderSystemWithAuth = () => {
@@ -386,8 +387,15 @@ const ClientInterface = ({ etablissementId }) => {
   // ============================================
   const [ordersOpen, setOrdersOpen] = useState(true);
   const [checkingOrdersOpen, setCheckingOrdersOpen] = useState(true);
+  // ============================================
+  // STRIPE PAYMENT
+  // ============================================
+  const [stripeEnabled, setStripeEnabled] = useState(false);
+  const [stripePublicKey, setStripePublicKey] = useState(null);
+  const [showPaymentScreen, setShowPaymentScreen] = useState(false);
+  const [pendingOrderData, setPendingOrderData] = useState(null);
 
-  // Écoute en temps réel du statut ordersOpen et nom établissement
+  // Écoute en temps réel du statut ordersOpen, nom établissement et config Stripe
   useEffect(() => {
     const unsubscribe = onSnapshot(
       doc(db, 'etablissements', etablissementId),
@@ -396,6 +404,9 @@ const ClientInterface = ({ etablissementId }) => {
           const data = docSnap.data();
           setOrdersOpen(data.ordersOpen ?? true);
           setEtablissementName(data.nom || etablissementId);
+          // Config Stripe
+          setStripeEnabled(data.stripeEnabled === true && !!data.stripePublicKey);
+          setStripePublicKey(data.stripePublicKey || null);
         }
         setCheckingOrdersOpen(false);
       },
@@ -572,16 +583,30 @@ const ClientInterface = ({ etablissementId }) => {
       timestamp: new Date().toISOString()
     };
 
+    // Si Stripe est activé, afficher l'écran de paiement
+    if (stripeEnabled && stripePublicKey) {
+      setPendingOrderData(newOrder);
+      setShowPaymentScreen(true);
+      setShowTipScreen(false);
+      return;
+    }
+
+    // Sinon, créer la commande directement (paiement sur place)
+    await createOrderDirectly(newOrder);
+  };
+
+  // Créer une commande sans paiement en ligne
+  const createOrderDirectly = async (orderData) => {
     try {
       const docRef = await addDoc(
         collection(db, 'etablissements', etablissementId, 'commandes'),
-        newOrder
+        orderData
       );
-      
-      localStorage.setItem(`currentOrderNumber_${etablissementId}`, newOrderNumber);
+
+      localStorage.setItem(`currentOrderNumber_${etablissementId}`, orderData.number);
       localStorage.setItem(`currentOrderId_${etablissementId}`, docRef.id);
 
-      setCurrentOrderNumber(newOrderNumber);
+      setCurrentOrderNumber(orderData.number);
       setCurrentOrderId(docRef.id);
       setHasActiveOrder(true);
       setShowCart(true);
@@ -590,6 +615,27 @@ const ClientInterface = ({ etablissementId }) => {
       console.error('Erreur création commande:', error);
       alert('Erreur lors de la création de la commande');
     }
+  };
+
+  // Callback quand le paiement Stripe réussit
+  const handlePaymentSuccess = (result) => {
+    localStorage.setItem(`currentOrderNumber_${etablissementId}`, result.orderNumber);
+    localStorage.setItem(`currentOrderId_${etablissementId}`, result.orderId);
+
+    setCurrentOrderNumber(result.orderNumber);
+    setCurrentOrderId(result.orderId);
+    setHasActiveOrder(true);
+    setShowCart(true);
+    setShowPaymentScreen(false);
+    setPendingOrderData(null);
+    setTipAmount(0);
+    setCustomTip('');
+  };
+
+  // Callback quand le paiement est annulé
+  const handlePaymentCancel = () => {
+    setShowPaymentScreen(false);
+    setShowTipScreen(true); // Retour à l'écran de tip
   };
 
   // ÉCRAN DE BLOCAGE SI COMMANDES FERMÉES
@@ -641,6 +687,34 @@ const ClientInterface = ({ etablissementId }) => {
           </a>
         </div>
       </div>
+    );
+  }
+
+  // Écran de paiement Stripe
+  if (showPaymentScreen && pendingOrderData && stripePublicKey) {
+    return (
+      <StripePayment
+        etablissementId={etablissementId}
+        stripePublicKey={stripePublicKey}
+        orderData={pendingOrderData}
+        total={pendingOrderData.total}
+        onSuccess={handlePaymentSuccess}
+        onCancel={handlePaymentCancel}
+        t={{
+          payment: t('payment') || 'Paiement',
+          orderSummary: t('orderSummary') || 'Résumé de la commande',
+          tip: t('tip'),
+          payNow: t('payNow') || 'Payer maintenant',
+          processing: t('processing') || 'Traitement en cours...',
+          securePayment: t('securePayment') || 'Paiement sécurisé par Stripe',
+          paymentSuccess: t('paymentSuccess') || 'Paiement réussi !',
+          orderConfirmed: t('orderConfirmed') || 'Votre commande a été confirmée',
+          paymentError: t('paymentError') || 'Erreur de paiement',
+          initPayment: t('initPayment') || 'Initialisation du paiement...',
+          back: t('back'),
+          cancel: t('cancel') || 'Annuler'
+        }}
+      />
     );
   }
 
